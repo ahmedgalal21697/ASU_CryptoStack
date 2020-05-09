@@ -46,6 +46,7 @@ Std_ReturnType Csm_Hash(uint32 jobId,
 						uint8 *resultPtr,
 						uint32 *resultLengthPtr)
 {
+    Std_ReturnType Ret = E_NOT_OK;
 	if (Csm_Status != CSM_INITIALIZED)
 	{
 		Det_ReportError(CSM_MODULE_ID,
@@ -66,18 +67,18 @@ Std_ReturnType Csm_Hash(uint32 jobId,
 		if (mode == CRYPTO_OPERATIONMODE_START)
 		{
 			md5_init(&md5_ctx);
-			return E_OK; //request successful
+			Ret = E_OK; //request successful
 		}
 		else if (mode == CRYPTO_OPERATIONMODE_UPDATE)
 		{
 			md5_update(&md5_ctx, dataPtr, dataLength);
-			return E_OK; //request successful
+			Ret = E_OK; //request successful
 		}
 		else if (mode == CRYPTO_OPERATIONMODE_STREAMSTART)
 		{
 			md5_init(&md5_ctx);
 			md5_update(&md5_ctx, dataPtr, dataLength);
-			return E_OK; //request successful
+			Ret = E_OK; //request successful
 		}
 		else if (mode == CRYPTO_OPERATIONMODE_FINISH)
 		{
@@ -87,7 +88,7 @@ Std_ReturnType Csm_Hash(uint32 jobId,
 		else if (mode == CRYPTO_OPERATIONMODE_SINGLECALL)
 		{
 			md5(dataPtr, dataLength, resultPtr, &md5_ctx);
-			return E_OK; //request successful
+			Ret = E_OK; //request successful
 		}
 	}
 	else
@@ -282,9 +283,8 @@ Std_ReturnType Csm_Hash(uint32 jobId,
 	}
 #endif
 
-	return E_NOT_OK; //request failed
-					 //		return CRYPTO_E_BUSY;            //request failed, service is still busy
-					 //			return CRYPTO_E_QUEUE_FULL;      //request failed, the queue is full
+	return Ret; //request failed
+
 }
 
 //Uses the given data to perform a MAC generation and stores the MAC in the memory location pointed to by the MAC pointer
@@ -296,10 +296,7 @@ Std_ReturnType Csm_MacGenerate(uint32 jobId,
 							   uint32 *macLengthPtr)
 {
 	return E_OK; //request successful
-				 //		return E_NOT_OK;                            //request failed CRYPTO_E_BUSY: request failed, service is still busy
-				 //			return CRYPTO_E_QUEUE_FULL;                 //request failed, the queue is full
-				 //		return CRYPTO_E_KEY_NOT_VALID;              //request failed, the key's state is "invalid"
-				 //			return CRYPTO_E_SMALL_BUFFER;               //the provided buffer is too small to store the result
+
 }
 
 //Verifies the given MAC by comparing if the MAC is generated with the given data
@@ -312,9 +309,7 @@ Std_ReturnType Csm_MacVerify(uint32 jobId,
 							 Crypto_VerifyResultType *verifyPtr)
 {
 	return E_OK; // request successful
-				 //	return E_NOT_OK;                              // request failed
-				 //	return CRYPTO_E_BUSY;                         // request failed, service is still busy CRYPTO_E_QUEUE_FULL: request failed, the queue is full
-				 //		return CRYPTO_E_KEY_NOT_VALID;                // request failed, the key's state is "invalid"
+
 }
 //Encrypts the given data and store the ciphertext in the memory location pointed by the result pointer
 Std_ReturnType Csm_Encrypt(uint32 jobId,
@@ -372,9 +367,6 @@ Std_ReturnType Csm_Encrypt(uint32 jobId,
 	}
 #endif
 	return E_NOT_OK; //request failed CRYPTO_E_BUSY: request failed, service is still busy
-					 //		return CRYPTO_E_QUEUE_FULL;                 //request failed, the queue is full
-					 //		return CRYPTO_E_KEY_NOT_VALID;              //request failed, the key's state is "invalid"
-					 //		return CRYPTO_E_SMALL_BUFFER;               //the provided buffer is too small to store the result
 }
 //Decrypts the given encrypted data and store the decrypted plaintext in the memory location pointed by the result pointer
 Std_ReturnType Csm_Decrypt(uint32 jobId,

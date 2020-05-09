@@ -4,17 +4,16 @@
 #include "Csm_Types.h"
 #include "CryIf_Cfg.h"
 
-
 /* version macrocs*/
-#define CRYIF_VENDOR_ID          (VENDOR_ID_ARCCORE)
-#define CRYIF_MODULE_ID          (MODULE_ID_CRYIF)
-#define CRYIF_AR_MAJOR_VERSION   4
-#define CRYIF_AR_MINOR_VERSION   3
-#define CRYIF_AR_PATCH_VERSION   1
+#define CRYIF_VENDOR_ID (VENDOR_ID_ARCCORE)
+#define CRYIF_MODULE_ID (MODULE_ID_CRYIF)
+#define CRYIF_AR_MAJOR_VERSION 4
+#define CRYIF_AR_MINOR_VERSION 3
+#define CRYIF_AR_PATCH_VERSION 1
 
-#define CRYIF_SW_MAJOR_VERSION   4
-#define CRYIF_SW_MINOR_VERSION   3
-#define CRYIF_SW_PATCH_VERSION   1
+#define CRYIF_SW_MAJOR_VERSION 4
+#define CRYIF_SW_MINOR_VERSION 3
+#define CRYIF_SW_PATCH_VERSION 1
 //-----------------------------------------------------------//
 
 /* Services IDs */
@@ -60,35 +59,29 @@
 */
 //--------------------------------------------------------------//
 
-
- 
 //--------------------------------------------------------------//
-void CryIf_Init( void );
+void CryIf_Init(void);
 //void CryIf_GetVersionInfo( Std_VersionInfoType* versioninfo );
-Std_ReturnType CryIf_ProcessJob( uint32 channelId, Crypto_JobType* job );
-Std_ReturnType CryIf_CancelJob( uint32 channelId, Crypto_JobType* job );
-Std_ReturnType CryIf_KeyElementSet( uint32 cryIfKeyId, uint32 keyElementId, const uint8* keyPtr, uint32 keyLength);
-Std_ReturnType CryIf_KeySetValid( uint32 cryIfKeyId);
-Std_ReturnType CryIf_KeyElementGet( uint32 cryIfKeyId, uint32 keyElementId, uint8* resultPtr, uint32* resultLengthPtr);
-Std_ReturnType CryIf_KeyElementCopy( uint32 cryIfKeyId, uint32 keyElementId, uint32 targetCryIfKeyId, uint32 targetKeyElementId );
-Std_ReturnType CryIf_KeyCopy( uint32 cryIfKeyId, uint32 targetCryIfKeyId );
-Std_ReturnType CryIf_RandomSeed( uint32 cryIfKeyId, const uint8* seedPtr, uint32 seedLength);
-Std_ReturnType CryIf_KeyGenerate( uint32 cryIfKeyId);
-Std_ReturnType CryIf_KeyDerive( uint32 cryIfKeyId, uint32 targetCryIfKeyId);
-Std_ReturnType CryIf_KeyExchangeCalcPubVal( uint32 cryIfKeyId, uint8* publicValuePtr, uint32* publicValueLengthPtr);
-Std_ReturnType CryIf_KeyExchangeCalcSecret( uint32 cryIfKeyId, const uint8* partnerPublicValuePtr, uint32 partnerPublicValueLength);
-Std_ReturnType CryIf_CertificateParse( uint32 cryIfKeyId);
-Std_ReturnType CryIf_CertificateVerify( uint32 cryIfKeyId, uint32 verifyCryIfKeyId, Crypto_VerifyResultType* verifyPtr);
+Std_ReturnType CryIf_ProcessJob(uint32 channelId, Crypto_JobType *job);
+Std_ReturnType CryIf_CancelJob(uint32 channelId, Crypto_JobType *job);
+Std_ReturnType CryIf_KeyElementSet(uint32 cryIfKeyId, uint32 keyElementId, const uint8 *keyPtr, uint32 keyLength);
+Std_ReturnType CryIf_KeySetValid(uint32 cryIfKeyId);
+Std_ReturnType CryIf_KeyElementGet(uint32 cryIfKeyId, uint32 keyElementId, uint8 *resultPtr, uint32 *resultLengthPtr);
+Std_ReturnType CryIf_KeyElementCopy(uint32 cryIfKeyId, uint32 keyElementId, uint32 targetCryIfKeyId, uint32 targetKeyElementId);
+Std_ReturnType CryIf_KeyCopy(uint32 cryIfKeyId, uint32 targetCryIfKeyId);
+Std_ReturnType CryIf_RandomSeed(uint32 cryIfKeyId, const uint8 *seedPtr, uint32 seedLength);
+Std_ReturnType CryIf_KeyGenerate(uint32 cryIfKeyId);
+Std_ReturnType CryIf_KeyDerive(uint32 cryIfKeyId, uint32 targetCryIfKeyId);
+Std_ReturnType CryIf_KeyExchangeCalcPubVal(uint32 cryIfKeyId, uint8 *publicValuePtr, uint32 *publicValueLengthPtr);
+Std_ReturnType CryIf_KeyExchangeCalcSecret(uint32 cryIfKeyId, const uint8 *partnerPublicValuePtr, uint32 partnerPublicValueLength);
+Std_ReturnType CryIf_CertificateParse(uint32 cryIfKeyId);
+Std_ReturnType CryIf_CertificateVerify(uint32 cryIfKeyId, uint32 verifyCryIfKeyId, Crypto_VerifyResultType *verifyPtr);
 
-void CryIf_CallbackNotification( const Crypto_JobType* job, Std_ReturnType result);
-
-
+void CryIf_CallbackNotification(const Crypto_JobType *job, Std_ReturnType result);
 
 /*SRS_BSW_00407 -> SWS_CryIf_91001  */
-#if ( CRYIF_VERSION_INFO_API == STD_ON )
-#define CryIf_GetVersionInfo(_vi) (STD_GET_VERSION_INFO((_vi),(CRYIF)))
+#if (CRYIF_VERSION_INFO_API == STD_ON)
+#define CryIf_GetVersionInfo(_vi) (STD_GET_VERSION_INFO((_vi), (CRYIF)))
 #endif
 
 #endif
-
-

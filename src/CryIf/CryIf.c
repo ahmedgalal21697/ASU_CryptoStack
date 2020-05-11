@@ -654,7 +654,7 @@ return ret;
 /**********************************************************************************************************************
  *  CryIf_KeyExchangeCalcPubValt()
  *********************************************************************************************************************/
-/*! \brief         set key element .
+/*! \brief
  *  \detailsThis function shall dispatch the key exchange public value calculation function to the configured crypto driver object.
  *
  *  \param[in]     cryIfKeyId              Holds the identifier of the key whose key element shall be  be used for the key exchange protocol.
@@ -725,7 +725,7 @@ if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){
 /**********************************************************************************************************************
  *  CryIf_KeyExchangeCalcSecret()
  *********************************************************************************************************************/
-/*! \brief         set key element .
+/*! \brief
  *  \details       This function shall dispatch the key exchange common shared secret calculation
                    function to the configured crypto driver object
  *
@@ -791,7 +791,7 @@ return ret;
 /**********************************************************************************************************************
  * CryIf_CertificateParse()
  *********************************************************************************************************************/
-/*! \brief         update key with generated value .
+/*! \brief         parse Certificate .
  *  \details       This function shall dispatch the certificate parse function to the configured crypto driver object.
  *  \param[in]     cryIfKeyId             Holds the identifier of the key which shall be parsed.
  *
@@ -843,7 +843,7 @@ return ret;
 /**********************************************************************************************************************
  *  CryIf_CertificateVerify()
  *********************************************************************************************************************/
-/*! \brief         set key element .
+/*! \brief         verify Certificate .
  *  \details       Verifies the certificate stored in the key referenced by verifyCryIfKeyId with the
  *                 certificate stored in the key referenced by cryIfKeyId.
  *

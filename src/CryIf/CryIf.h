@@ -66,14 +66,11 @@ Std_ReturnType CryIf_KeyExchangeCalcSecret( uint32 cryIfKeyId, const uint8* part
 Std_ReturnType CryIf_CertificateParse( uint32 cryIfKeyId);
 Std_ReturnType CryIf_CertificateVerify( uint32 cryIfKeyId, uint32 verifyCryIfKeyId, Crypto_VerifyResultType* verifyPtr);
 
-void CryIf_CallbackNotification( const Crypto_JobType* job, Std_ReturnType result);
+/*void CryIf_CallbackNotification( const Crypto_JobType* job, Std_ReturnType result);*/
 
 
 
 
-#if ( CRYIF_VERSION_INFO_API == STD_ON )
-#define CryIf_GetVersionInfo(_vi) (STD_GET_VERSION_INFO((_vi),(CRYIF)))
-#endif
 
 #endif
 

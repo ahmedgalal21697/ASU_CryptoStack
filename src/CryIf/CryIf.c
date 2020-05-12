@@ -21,7 +21,7 @@
  *********************************************************************************************************************/
 
 static boolean  Init_Done=FALSE;
-//TODO get key elements size
+
 /**********************************************************************************************************************
  *  LOCAL FUNCTION PROTOTYPES
  *********************************************************************************************************************/
@@ -50,9 +50,9 @@ boolean validateID ( uint32 ID );
  *********************************************************************************************************************/
 boolean validateID  ( uint32 ID ) {
     if ( ID <minR ||  ID >maxR)
-    return 0 ;
+    return FALSE ;
         else
-            return 1;
+            return TRUE ;
 }
 /**********************************************************************************************************************
  * CryIf_Init()
@@ -69,7 +69,7 @@ boolean validateID  ( uint32 ID ) {
  *  \synchronous   TRUE
  *********************************************************************************************************************/
 void CryIf_Init( void ) {
-    Init_Done=TRUE;
+    Init_Done=TRUE;  /*[SWS_CryIf_00015]*/
 
 }
 /**********************************************************************************************************************
@@ -89,11 +89,11 @@ void CryIf_Init( void ) {
  *********************************************************************************************************************/
 void CryIf_GetVersionInfo(Std_VersionInfoType* versioninfo ) {
 
-   if(FALSE==Init_Done ){
+   if(FALSE==Init_Done ){  /*[SWS_CryIf_00016]*/
 
        Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_GET_VERSION_INFO ,CRYIF_E_UNINIT);
    }
-   else if(NULL==versioninfo ){
+   else if(NULL==versioninfo ){ /*[SWS_CryIf_00017]*/
 
           Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_GET_VERSION_INFO ,CRYIF_E_PARAM_POINTER);
       }
@@ -138,29 +138,32 @@ Std_ReturnType CryIf_ProcessJob( uint32 channelId, Crypto_JobType* job ){
     boolean flag =0;
     #if (CRYIF_DEV_ERROR_DETECT ==STD_ON)
 
-if (FALSE==Init_Done) {
+if (FALSE==Init_Done) { /*[SWS_CryIf_00027]*/
 
  Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_PROCESSJOB_ID ,CRYIF_E_UNINIT);
    ret=E_NOT_OK;
 }
-else if ( NULL==job)  {
+
+else if  (FALSE==validateID(channelId) ){ /*[SWS_CryIf_00028]*/
+
+ Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_PROCESSJOB_ID, CRYIF_E_PARAM_HANDLE );
+   ret= E_NOT_OK;
+}
+
+else if ( NULL==job)  { /*[SWS_CryIf_00029]*/
 
  Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_PROCESSJOB_ID,CRYIF_E_PARAM_POINTER);
    ret=E_NOT_OK ;
 
 }
 
-else if  (FALSE==validateID(channelId) ){
 
- Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_PROCESSJOB_ID, CRYIF_E_PARAM_HANDLE );
-   ret= E_NOT_OK;
-}
 else {
 
    flag=1;
 }
    #endif
-if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){
+if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){ /*[SWS_CryIf_00044]*/
 
     ret= Crypto_ProcessJob( CHANNELS [channelId].obj, job );
 }
@@ -194,27 +197,30 @@ Std_ReturnType CryIf_CancelJob( uint32 channelId, Crypto_JobType* job )
     boolean flag =0;
 #if (CRYIF_DEV_ERROR_DETECT ==STD_ON)
 
-if (FALSE==Init_Done) {
+if (FALSE==Init_Done) { /*[SWS_CryIf_00129]*/
 
   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_CANCEL_JOB_ID,CRYIF_E_UNINIT);
       ret= E_NOT_OK;
 }
-else if ( NULL==job)  {
+
+else if (FALSE==validateID(channelId) ){/*[SWS_CryIf_00130]*/
+  Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_CANCEL_JOB_ID, CRYIF_E_PARAM_HANDLE );
+    ret= E_NOT_OK;
+}
+
+else if ( NULL==job)  { /*[SWS_CryIf_00131]*/
   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_CANCEL_JOB_ID,CRYIF_E_PARAM_POINTER);
     ret= E_NOT_OK ;
 
 }
 
-else if (FALSE==validateID(channelId) ){
-  Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_CANCEL_JOB_ID, CRYIF_E_PARAM_HANDLE );
-    ret= E_NOT_OK;
-}
+
 else {
 
     flag=1;
 }
     #endif
-if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){
+if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){ /*[SWS_CryIf_00132]*/
 
     Crypto_JobInfoType **Const_to_NON=(Crypto_JobInfoType**)((Crypto_JobInfoType*)&job->jobInfo);/*pointerTopointer cast to avoid warning */
     ret= Crypto_CancelJob(CHANNELS [channelId].obj,*Const_to_NON);
@@ -259,36 +265,38 @@ Std_ReturnType CryIf_KeyElementSet( uint32 cryIfKeyId, uint32 keyElementId, cons
     boolean flag =0;
 #if (CRYIF_DEV_ERROR_DETECT ==STD_ON)
 
-if (FALSE==Init_Done) {
+if (FALSE==Init_Done) { /*[SWS_CryIf_00049]*/
 
   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_ELEMENT_SET_ID ,CRYIF_E_UNINIT);
     ret=E_NOT_OK;
 }
 
-else if (FALSE==validateID(cryIfKeyId)) {
+else if (FALSE==validateID(cryIfKeyId)) { /*[SWS_CryIf_00050]*/
 
   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_ELEMENT_SET_ID, CRYIF_E_PARAM_HANDLE );
       ret= E_NOT_OK;
 }
 
-else if(0==keyLength) {
+else if ( NULL==keyPtr )  { /* [SWS_CryIf_00052]*/
+
+  Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_PROCESSJOB_ID,CRYIF_E_PARAM_POINTER);
+      ret= E_NOT_OK ;
+}
+
+else if(0==keyLength) {  /*[SWS_CryIf_00053]*/
 
   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_ELEMENT_SET_ID,CRYIF_E_PARAM_VALUE );
      ret= E_NOT_OK;
 }
 
-else if ( NULL==keyPtr )  {
 
-  Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_PROCESSJOB_ID,CRYIF_E_PARAM_POINTER);
-      ret= E_NOT_OK ;
-}
 else {
 
   flag=1;
 
 }
 #endif
-if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){
+if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){  /*[SWS_CryIf_00055]*/
 
    ret= Crypto_KeyElementSet( KEYS[cryIfKeyId].CryptoKey ,  keyElementId,  keyPtr, keyLength )  ;
 }
@@ -320,12 +328,12 @@ Std_ReturnType CryIf_Key_SetValid( uint32 cryIfKeyId){
      boolean flag =0;
     #if (CRYIF_DEV_ERROR_DETECT ==STD_ON)
 
-if (FALSE==Init_Done) {
+if (FALSE==Init_Done) { /*[SWS_CryIf_00056]*/
   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_SET_VALID_ID,CRYIF_E_UNINIT);
     ret= E_NOT_OK;
 }
 
-else if (FALSE==validateID(cryIfKeyId)) {
+else if (FALSE==validateID(cryIfKeyId)) { /*[SWS_CryIf_00057]*/
 
   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_SET_VALID_ID, CRYIF_E_PARAM_HANDLE );
     ret= E_NOT_OK;
@@ -335,7 +343,7 @@ else {
   flag=1;
 }
 #endif
-if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){
+if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){ /*[SWS_CryIf_00058]*/
 
    ret= Crypto_KeySetValid(KEYS[cryIfKeyId].CryptoKey );
 }
@@ -384,27 +392,27 @@ Std_ReturnType CryIf_KeyElementGet( uint32 cryIfKeyId,uint32 keyElementId, uint8
       boolean flag =0;
     #if (CRYIF_DEV_ERROR_DETECT ==STD_ON)
 
-if (FALSE==Init_Done) {
+if (FALSE==Init_Done) { /*[SWS_CryIf_00059]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_ELEMENT_GET_ID ,CRYIF_E_UNINIT);
      ret= E_NOT_OK;
 }
-else if (FALSE==validateID(cryIfKeyId) ){
+else if (FALSE==validateID(cryIfKeyId) ){ /*[SWS_CryIf_00060]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_ELEMENT_GET_ID, CRYIF_E_PARAM_HANDLE );
      ret= E_NOT_OK;}
-else if ( NULL== resultPtr)  {
+else if ( NULL== resultPtr)  { /*[SWS_CryIf_00062]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_ELEMENT_GET_ID,CRYIF_E_PARAM_POINTER);
       ret= E_NOT_OK ;
 }
-else if ( NULL== resultLengthPtr)  {
+else if ( NULL== resultLengthPtr)  { /*[SWS_CryIf_00063]*/
 
     Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_ELEMENT_GET_ID,CRYIF_E_PARAM_POINTER);
       ret= E_NOT_OK ;
 }
 
-else if ( 0== *resultLengthPtr)  {
+else if ( 0== *resultLengthPtr)  { /*[SWS_CryIf_00064]*/
 
     Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_ELEMENT_GET_ID,CRYIF_E_PARAM_VALUE);
         ret= E_NOT_OK ;
@@ -414,7 +422,7 @@ else {
        flag=1;
 }
 #endif
-if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){
+if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){  /*[SWS_CryIf_00065]*/
 
     ret= Crypto_KeyElementGet( KEYS[cryIfKeyId].CryptoKey, keyElementId,  resultPtr,  resultLengthPtr );
 }
@@ -422,6 +430,87 @@ return ret;
 }
 
 //TODO implement CryIf_KeyElementCopy()
+/**********************************************************************************************************************
+ *  CryIf_KeyElementCopy()
+ *********************************************************************************************************************/
+/*! \brief         copy key element of the recieved key
+ *  \details       This function shall copy a key elements from one key to a target key.
+
+
+ *  \param[in]     cryIfKeyId              Holds the identifier of the key whose key element shall be the source element.
+                   keyElementId            Holds the identifier of the key element which shall be the source for the copy operation.
+                   targetCryIfKeyId        Holds the identifier of the key whose key element shall be the destination element
+                   targetKeyElementId      Holds the identifier of the key element which shall be the destination for the copy operation.
+
+
+ *  \param[in,out] NONE
+ *
+ *  \param[out]    NONE
+ *  \service id   0x0f
+ *  \return        E_OK                    Request successful.
+ *  \return        E_NOT_OK                Request failed.
+ *  \return        CRYPTO_E_BUSY           Request failed, Crypto Driver Object is busy.
+ *  \return        CRYPTO_E_KEY_NOT_AVAILABLE  Request failed because the key is not available.
+ *  \return        CRYPTO_E_KEY_READ_FAIL   Request failed, not allowed to extract key element.
+ *  \return        CRYPTO_E_KEY_WRITE_FAIL   Request failed, not allowed to write key element.
+ *  \return        CRYPTO_E_KEY_SIZE_MISMATCH   Request failed, key element size does not match size of provided data.
+
+ *  \pre           Param queueIdx needs to be a valid index.
+ *                 Job must point to a valid job object.
+ *  \context       TASK
+ *  \reentrant     TRUE,but not for the same cryIfKeyId.
+ *  \synchronous   TRUE
+ *********************************************************************************************************************/
+Std_ReturnType CryIf_KeyElementCopy( uint32 cryIfKeyId, uint32 keyElementId, uint32 targetCryIfKeyId, uint32 targetKeyElementId ){
+
+     Std_ReturnType ret =E_NOT_OK;
+     boolean flag =0;
+
+#if (CRYIF_DEV_ERROR_DETECT ==STD_ON)
+
+if (FALSE==Init_Done) { /*[SWS_CryIf_00110]*/
+
+   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_ELEMENT_COPY_ID ,CRYIF_E_UNINIT);
+        ret= E_NOT_OK;
+}
+
+else if (FALSE==validateID(cryIfKeyId) ){ /*[SWS_CryIf_00111]*/
+
+   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_ELEMENT_COPY_ID, CRYIF_E_PARAM_HANDLE );
+      ret= E_NOT_OK;
+}
+
+else if (FALSE==validateID(targetCryIfKeyId)){ /*[SWS_CryIf_00112]*/
+
+   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_ELEMENT_COPY_ID, CRYIF_E_PARAM_HANDLE );
+      ret= E_NOT_OK;
+}
+
+else {
+
+    flag=1;
+
+}
+    #endif
+
+if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){ /*[SWS_CryIf_00113]*/
+  ret= Crypto_KeyCopy(KEYS[cryIfKeyId].CryptoKey , KEYS[targetCryIfKeyId].CryptoKey);
+  /*cryIfKeyId and targetCryIfKeyId are located in the same Crypto Driver*/
+}
+/*TODO [SWS_CryIf_00114]
+*cryIfKeyId and targetCryIfKeyId are located in different Crypto Drivers,
+*the service CryIf_KeyElementCopy() shall copy the provided key element by getting the element with Crypto_<vi>_<ai>_KeyElementGet()
+*and setting the target key element via Crypto_<vi>_<ai>_KeyElementSet().
+*/
+
+/*TODO [SWS_CryIf_00115]
+*If a key element of cryIfKeyId is not available in targetCryIfKeyId,
+*the key element shall not be copied and no error code shall be returned.
+*If the source element size does not match the target key elements size,
+*If CryIf_KeyElementCopy()shall report CRYIF_E_KEY_SIZE_MISMATCH to the DET and return E_NOT_OK.
+*/
+return ret ;
+}
 /**********************************************************************************************************************
  *   CryIf_KeyCopy()
  *********************************************************************************************************************/
@@ -453,18 +542,18 @@ Std_ReturnType CryIf_KeyCopy( uint32 cryIfKeyId, uint32 targetCryIfKeyId ){
     boolean flag =0;
 #if (CRYIF_DEV_ERROR_DETECT ==STD_ON)
 
-if (FALSE==Init_Done) {
+if (FALSE==Init_Done) {  /*[SWS_CryIf_00116]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_COPY_ID ,CRYIF_E_UNINIT);
     ret= E_NOT_OK;
 }
 
-else if (FALSE==validateID(cryIfKeyId) ){
+else if (FALSE==validateID(cryIfKeyId) ){ /*[SWS_CryIf_00117]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_COPY_ID, CRYIF_E_PARAM_HANDLE );
     ret= E_NOT_OK;
 }
-else if (FALSE==validateID(targetCryIfKeyId)){
+else if (FALSE==validateID(targetCryIfKeyId)){ /*[SWS_CryIf_00118]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_COPY_ID, CRYIF_E_PARAM_HANDLE );
     ret= E_NOT_OK;
@@ -475,13 +564,24 @@ else{
 
 }
     #endif
-if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){
+if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){ /*[SWS_CryIf_00119]*/
     ret= Crypto_KeyCopy(KEYS[cryIfKeyId].CryptoKey , KEYS[targetCryIfKeyId].CryptoKey);
+    /*cryIfKeyId and targetCryIfKeyId are located in the same Crypto Driver*/
 }
-//TODO [SWS_CryIf_00120]
-//TODO [SWS_CryIf_00121]
+/*TODO [SWS_CryIf_00120]
+*cryIfKeyId and targetCryIfKeyId are located in different Crypto Drivers,
+*the service CryIf_KeyCopy() shall copy the provided key element by getting
+*the the element with Crypto_<vi>_<ai>_KeyElementGet() and
+*the setting the target key element via Crypto_<vi>_<ai>_KeyElementSet().
+*/
 
-   return ret ;
+/*TODO [SWS_CryIf_00121]
+*If a key element of cryIfKeyId is not available in targetCryIfKeyId,
+*the key element shall not be copied and no error code shall be returned.
+*If the source element size does not match the target key elements size,
+*If CryIf_Copy()shall report CRYIF_E_KEY_SIZE_MISMATCH to the DET and return E_NOT_OK.
+*/
+  return ret ;
 
 }
 
@@ -517,23 +617,23 @@ Std_ReturnType CryIf_RandomSeed( uint32 cryIfKeyId, const uint8* seedPtr, uint32
  Std_ReturnType ret=E_NOT_OK;
 #if (CRYIF_DEV_ERROR_DETECT ==STD_ON)
 
-if (FALSE==Init_Done) {
+if (FALSE==Init_Done) { /*[SWS_CryIf_00068]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_RANDOM_SEED_ID,CRYIF_E_UNINIT);
       ret= E_NOT_OK;
 }
-if (FALSE==validateID(cryIfKeyId) ){
+if (FALSE==validateID(cryIfKeyId) ){  /*[SWS_CryIf_00069]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_RANDOM_SEED_ID, CRYIF_E_PARAM_HANDLE );
      ret= E_NOT_OK;
     }
 
-else if ( NULL== seedPtr)  {
+else if ( NULL== seedPtr)  {  /*[SWS_CryIf_00070]*/
 
   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_RANDOM_SEED_ID,CRYIF_E_PARAM_POINTER);
     ret= E_NOT_OK ;
 }
-else if(0==seedLength) {
+else if(0==seedLength) {  /*[SWS_CryIf_00071]*/
 
   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_RANDOM_SEED_ID,CRYIF_E_PARAM_VALUE );
       ret= E_NOT_OK ;
@@ -542,7 +642,7 @@ else{
    flag=1;
 }
     #endif
-if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){
+if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){  /*[SWS_CryIf_00072]*/
 
    ret= Crypto_RandomSeed( KEYS[cryIfKeyId].CryptoKey,  seedPtr,  seedLength);
 }
@@ -574,12 +674,12 @@ Std_ReturnType CryIf_KeyGenerate( uint32 cryIfKeyId){
     Std_ReturnType ret=E_NOT_OK;
      boolean flag =0;
    #if (CRYIF_DEV_ERROR_DETECT ==STD_ON)
-if (FALSE==Init_Done) {
+if (FALSE==Init_Done) {  /*[SWS_CryIf_00073]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_GENERATE_ID,CRYIF_E_UNINIT);
     ret= E_NOT_OK;
 }
-else if (FALSE==validateID(cryIfKeyId) ){
+else if (FALSE==validateID(cryIfKeyId) ){  /*[SWS_CryIf_00074]*/
   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_GENERATE_ID, CRYIF_E_PARAM_HANDLE );
     ret= E_NOT_OK;
 }
@@ -588,7 +688,7 @@ else {
        flag=1;
 }
   #endif
-if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){
+if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){  /*[SWS_CryIf_00075]*/
 
     ret= Crypto_KeyGenerate(  KEYS[cryIfKeyId].CryptoKey);
 }
@@ -623,18 +723,18 @@ Std_ReturnType CryIf_KeyDerive( uint32 cryIfKeyId, uint32 targetCryIfKeyId){
     Std_ReturnType ret=E_NOT_OK;
   #if (CRYIF_DEV_ERROR_DETECT ==STD_ON)
 
-if (FALSE==Init_Done) {
+if (FALSE==Init_Done) {  /*[SWS_CryIf_00076]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_DERIVE_ID,CRYIF_E_UNINIT);
     ret= E_NOT_OK;
 }
-else if (FALSE==validateID(cryIfKeyId) ){
+else if (FALSE==validateID(cryIfKeyId) ){  /*[SWS_CryIf_00077]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_DERIVE_ID, CRYIF_E_PARAM_HANDLE );
     ret= E_NOT_OK;
 }
 
-else if (FALSE==validateID(targetCryIfKeyId) ){
+else if (FALSE==validateID(targetCryIfKeyId) ){  /*[SWS_CryIf_00122]*/
     Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_DERIVE_ID, CRYIF_E_PARAM_HANDLE );
      ret= E_NOT_OK;
 }
@@ -644,7 +744,7 @@ else{
 }
 
   #endif
-if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){
+if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){  /*[SWS_CryIf_00081]*/
 
     ret= Crypto_KeyDerive(KEYS[cryIfKeyId].CryptoKey,KEYS[targetCryIfKeyId].CryptoKey);
 }
@@ -688,27 +788,27 @@ Std_ReturnType CryIf_KeyExchangeCalcPubVal( uint32 cryIfKeyId, uint8* publicValu
 
 #if (CRYIF_DEV_ERROR_DETECT ==STD_ON)
 
-if (FALSE==Init_Done) {
+if (FALSE==Init_Done) { /*[SWS_CryIf_00082]*/
 
   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_EXCHANGE_CALC_PUBVAL_ID,CRYIF_E_UNINIT);
     ret=E_NOT_OK;
 }
-else if (FALSE==validateID(cryIfKeyId) ){
+else if (FALSE==validateID(cryIfKeyId) ){ /*[SWS_CryIf_00083]*/
 
   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_EXCHANGE_CALC_PUBVAL_ID, CRYIF_E_PARAM_HANDLE );
     ret=E_NOT_OK;}
 
-else if ( NULL==publicValuePtr)  {
+else if ( NULL==publicValuePtr)  { /*[SWS_CryIf_00084]*/
 
   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_EXCHANGE_CALC_PUBVAL_ID,CRYIF_E_PARAM_POINTER);
     ret= E_NOT_OK ;
 }
-else if ( NULL==publicValueLengthPtr)  {
+else if ( NULL==publicValueLengthPtr)  { /*[SWS_CryIf_00085]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_EXCHANGE_CALC_PUBVAL_ID,CRYIF_E_PARAM_POINTER);
      ret= E_NOT_OK ;
 }
-else if ( 0== *publicValueLengthPtr)  {
+else if ( 0== *publicValueLengthPtr)  { /*[SWS_CryIf_00086]*/
 Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_EXCHANGE_CALC_PUBVAL_ID,CRYIF_E_PARAM_VALUE);
      ret= E_NOT_OK ;}
 else {
@@ -717,7 +817,7 @@ else {
 }
   #endif
 
-if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){
+if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){ /*[SWS_CryIf_00087]*/
   ret= Crypto_KeyExchangeCalcPubVal(KEYS[cryIfKeyId].CryptoKey,publicValuePtr, publicValueLengthPtr);
 }
          return ret;
@@ -750,29 +850,35 @@ if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){
  *  \synchronous   TRUE
  *********************************************************************************************************************/
 
-Std_ReturnType CryIf_KeyExchangeCalcSecret( uint32 cryIfKeyId, const uint8* partnerPublicValuePtr, uint32 partnerPublicValueLength){
+Std_ReturnType CryIf_KeyExchangeCalcSecret( uint32 cryIfKeyId, const uint8* partnerPublicValuePtr, uint32* partnerPublicValueLength){
     boolean flag =0;
     Std_ReturnType ret=E_NOT_OK;
 
 #if (CRYIF_DEV_ERROR_DETECT ==STD_ON)
 
- if (FALSE==Init_Done) {
+ if (FALSE==Init_Done) { /*[SWS_CryIf_00090]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_EXCHANGE_CALC_SECRET_ID,CRYIF_E_UNINIT);
     ret= E_NOT_OK;
 }
-else if (FALSE==validateID(cryIfKeyId) ){
+else if (FALSE==validateID(cryIfKeyId) ){ /*[SWS_CryIf_00091]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_EXCHANGE_CALC_SECRET_ID, CRYIF_E_PARAM_HANDLE );
     ret= E_NOT_OK;
 }
 
-else if ( NULL==partnerPublicValuePtr)  {
+else if ( NULL==partnerPublicValuePtr)  { /*[SWS_CryIf_00092]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_EXCHANGE_CALC_SECRET_ID,CRYIF_E_PARAM_POINTER);
      ret= E_NOT_OK ;
 }
-else if(0==partnerPublicValueLength) {
+
+else if ( NULL==partnerPublicValueLength)  { /*[SWS_CryIf_00093]*/
+
+   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_EXCHANGE_CALC_SECRET_ID,CRYIF_E_PARAM_POINTER);
+     ret= E_NOT_OK ;
+}
+else if(0==partnerPublicValueLength) { /*[SWS_CryIf_00093]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_KEY_EXCHANGE_CALC_SECRET_ID,CRYIF_E_PARAM_VALUE );
     ret= E_NOT_OK ;
@@ -783,7 +889,7 @@ else {
 }
 
 #endif
-if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){
+if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){ /*[SWS_CryIf_00095]*/
   ret= Crypto_KeyExchangeCalcSecret(KEYS[cryIfKeyId].CryptoKey, partnerPublicValuePtr, partnerPublicValueLength ) ;
 }
 return ret;
@@ -818,12 +924,12 @@ Std_ReturnType CryIf_CertificateParse( uint32 cryIfKeyId){
 
 #if (CRYIF_DEV_ERROR_DETECT ==STD_ON)
 
- if (FALSE==Init_Done) {
+ if (FALSE==Init_Done) { /*[SWS_CryIf_00098]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_CERTIFICATE_PARSE_ID,CRYIF_E_UNINIT);
      ret= E_NOT_OK;
 }
-else if (FALSE==validateID(cryIfKeyId) ){
+else if (FALSE==validateID(cryIfKeyId) ){ /*[SWS_CryIf_00099]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_CERTIFICATE_PARSE_ID, CRYIF_E_PARAM_HANDLE );
      ret= E_NOT_OK;
@@ -833,7 +939,7 @@ else {
      flag=1;
 }
 #endif
-if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){
+if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){ /*[SWS_CryIf_00104]*/
 
   ret= Crypto_CertificateParse(KEYS[cryIfKeyId].CryptoKey);
 }
@@ -874,26 +980,29 @@ Std_ReturnType CryIf_CertificateVerify( uint32 cryIfKeyId, uint32 verifyCryIfKey
     Std_ReturnType ret=E_NOT_OK;
 
 #if (CRYIF_DEV_ERROR_DETECT ==STD_ON)
- if (FALSE==Init_Done) {
+ if (FALSE==Init_Done) { /*[SWS_CryIf_00123]*/
 
   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_CERTIFICATE_VERIFY_ID,CRYIF_E_UNINIT);
    ret= E_NOT_OK;
 }
-else if (FALSE==validateID(cryIfKeyId)) {
+else if (FALSE==validateID(cryIfKeyId)) { /*[SWS_CryIf_00124]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_CERTIFICATE_VERIFY_ID, CRYIF_E_PARAM_HANDLE );
    ret= E_NOT_OK;
 }
 
-else if (FALSE==validateID(verifyCryIfKeyId) ){
+else if (FALSE==validateID(verifyCryIfKeyId) ){ /*[SWS_CryIf_00125]*/
 
    Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_CERTIFICATE_VERIFY_ID, CRYIF_E_PARAM_HANDLE );
     ret= E_NOT_OK;
 }
 /*
-TODO check same driver or not
+TODO [SWS_CryIf_00126]
+*If development error detection for the CRYIF module is enabled:
+*If  The function CryIf_CertificateVerify shall report CRYIF_E_PARAM_HANDLE to the DET and return E_NOT_OK
+*If  if the keys identified by validateCryIfKeyId and cryIfKeyId are not located in the same Crypto Driver.
 */
-else if ( NULL==verifyPtr)  {
+else if ( NULL==verifyPtr)  { /*[SWS_CryIf_00127]*/
 
   Det_ReportError(MODULE_ID_CRYIF,0,CRYIF_CERTIFICATE_VERIFY_ID,CRYIF_E_PARAM_POINTER);
    ret= E_NOT_OK ;
@@ -903,7 +1012,7 @@ else {
     flag=1;
 }
 #endif
-if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){
+if((flag==1) || (CRYIF_DEV_ERROR_DETECT ==STD_OFF)){  /*[SWS_CryIf_00127]*/
 
   ret= Crypto_CertificateVerify(KEYS[cryIfKeyId].CryptoKey,KEYS[verifyCryIfKeyId].CryptoKey, verifyPtr);
 }

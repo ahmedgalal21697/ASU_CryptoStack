@@ -167,7 +167,7 @@ Std_ReturnType Csm_Hash(uint32 jobId,
 						CSM_INSTANCE_ID,
 						Csm_Hash_SID,
 						CSM_E_UNINIT);
-						 return E_NOT_OK ;
+						 
 	}
 	else
 	{
@@ -180,7 +180,7 @@ Std_ReturnType Csm_Hash(uint32 jobId,
         Crypto_JobPrimitiveInfoType local_Crypto_JobPrimitiveInfoType={0,local_Crypto_PrimitiveInfoType_Ptr,0,0,FALSE};
 
         const Crypto_JobPrimitiveInfoType* local_Crypto_JobPrimitiveInfoType_Ptr =&local_Crypto_JobPrimitiveInfoType;
-        Crypto_JobType local_Crypto_JobType={CsmJobs[jobId].CsmJobId,CRYPTO_JOBSTATE_IDLE,local_Crypto_JobPrimitiveInputOutputType,local_Crypto_JobPrimitiveInfoType_Ptr,local_Crypto_JobInfoType_Ptr,1};		// 1 cryptokey id -job mode n't sure
+        Crypto_JobType local_Crypto_JobType={CsmJobs[jobId].CsmJobId,CRYPTO_JOBSTATE_IDLE,local_Crypto_JobPrimitiveInputOutputType,local_Crypto_JobPrimitiveInfoType_Ptr,local_Crypto_JobInfoType_Ptr,1};		
         Crypto_JobType* local_Crypto_JobType_Ptr =&local_Crypto_JobType;
 
 							 if((*resultLengthPtr)>=job_CsmHashConfig[CsmJobs[jobId].CsmJobId].CsmHashResultLength){
@@ -188,17 +188,17 @@ Std_ReturnType Csm_Hash(uint32 jobId,
 							 uint8 ** resultPtr_PPtr=(uint8 **)resultPtr;
 							 *resultPtr_PPtr= local_Crypto_JobType_Ptr->jobPrimitiveInputOutput.outputPtr;
 					
-									return E_OK;							
+									Ret= E_OK;							
 									}
 									else{
-										return CRYPTO_E_SMALL_BUFFER; 
+										Ret= CRYPTO_E_SMALL_BUFFER; 
 									}
 	}
 
 
 
 
-	return Ret; //request failed
+	return Ret; 
 
 }
 /**********************************************************************************************************************
@@ -246,7 +246,10 @@ Std_ReturnType Csm_MacGenerate(uint32 jobId,
 							   uint8 *macPtr,
 							   uint32 *macLengthPtr)
 {
-	return E_OK; //request successful
+	    Std_ReturnType Ret = E_NOT_OK;
+
+	Ret= E_OK; 
+	return Ret;
 
 }
 /**********************************************************************************************************************
@@ -293,7 +296,9 @@ Std_ReturnType Csm_MacVerify(uint32 jobId,
 							 const uint32 macLength,
 							 Crypto_VerifyResultType *verifyPtr)
 {
-	return E_OK; 
+	    Std_ReturnType Ret = E_NOT_OK;
+
+	return Ret; 
 
 }
 /**********************************************************************************************************************
@@ -341,13 +346,15 @@ Std_ReturnType Csm_Encrypt(uint32 jobId,
 						   uint8 *resultPtr,
 						   uint32 *resultLengthPtr)
 {
+	    Std_ReturnType Ret = E_NOT_OK;
+
 	if (Csm_Status != CSM_SERVICE_ACTIVE)
 	{
 		Det_ReportError(CSM_MODULE_ID,
 						CSM_INSTANCE_ID,
 						Csm_Encrypt_SID,
 						CSM_E_UNINIT);
-						return E_NOT_OK;
+						
 	}
 	else
 	{
@@ -368,13 +375,14 @@ Std_ReturnType Csm_Encrypt(uint32 jobId,
 	                                 uint8 ** resultPtr_PPtr=(uint8 **)resultPtr;
 	                                 *resultPtr_PPtr= local_Crypto_JobType_Ptr->jobPrimitiveInputOutput.outputPtr;
 
-	                                        return E_OK;
+	                                        Ret= E_OK;
 	                                        }
 	                                        else{
-	                                            return CRYPTO_E_SMALL_BUFFER;
+	                                            Ret= CRYPTO_E_SMALL_BUFFER;
 	                                        }
 
 	                                 	                             }
+																	 return Ret;
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -420,13 +428,15 @@ Std_ReturnType Csm_Decrypt(     uint32 jobId,
 								uint32 dataLength,
 								uint8* resultPtr,
 								uint32* resultLengthPtr ){
+									    Std_ReturnType Ret = E_NOT_OK;
+
 			if(Csm_Status != CSM_SERVICE_ACTIVE){
             Det_ReportError(    CSM_MODULE_ID,
                                 CSM_INSTANCE_ID,	
 		                            Csm_Decrypt_SID,
 		                            CSM_E_UNINIT );
 				                                        
-																			return E_NOT_OK;
+																			
 				                                        }
 else{
 
@@ -447,12 +457,14 @@ else{
                                          uint8 ** resultPtr_PPtr=(uint8 **)resultPtr;
                                          *resultPtr_PPtr= local_Crypto_JobType_Ptr->jobPrimitiveInputOutput.outputPtr;
 
-                                                return E_OK;
+                                                Ret= E_OK;
                                                 }
                                                 else{
-                                                    return CRYPTO_E_SMALL_BUFFER;
+                                                    Ret= CRYPTO_E_SMALL_BUFFER;
                                                 }
+
     }
+	return Ret;
 														 }
 		
 /**********************************************************************************************************************
@@ -515,7 +527,9 @@ Std_ReturnType Csm_AEADEncrypt(uint32 jobId,
 							   uint8 *tagPtr,
 							   uint32 *tagLengthPtr)
 {
-	return E_OK; 
+	    Std_ReturnType Ret = E_NOT_OK;
+
+	return Ret; 
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -576,7 +590,9 @@ Std_ReturnType Csm_AEADDecrypt(uint32 jobId,
 							   uint32 *plaintextLengthPtr,
 							   Crypto_VerifyResultType *verifyPtr)
 {
-	return E_OK; 
+	    Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret; 
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -623,7 +639,9 @@ Std_ReturnType Csm_SignatureGenerate(uint32 jobId,
 									 uint8 *resultPtr,
 									 uint32 *resultLengthPtr)
 {
-	return E_OK; 
+	    Std_ReturnType Ret = E_NOT_OK;
+
+	    return Ret; 
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -670,8 +688,10 @@ Std_ReturnType Csm_SignatureVerify(uint32 jobId,
 								   uint32 signatureLength,
 								   Crypto_VerifyResultType *verifyPtr)
 {
-	return E_OK;
-}
+Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret; 
+		 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
  *********************************************************************************************************************/
@@ -701,7 +721,9 @@ Std_ReturnType Csm_SignatureVerify(uint32 jobId,
 Std_ReturnType Csm_SecureCounterIncrement(uint32 jobId,
 										  uint64 stepSize)
 {
-	return E_OK; 
+	Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret;  
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -731,7 +753,9 @@ Std_ReturnType Csm_SecureCounterIncrement(uint32 jobId,
 Std_ReturnType Csm_SecureCounterRead(uint32 jobId,
 									 uint64 *counterValuePtr)
 {
-	return E_OK; 
+	Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret;  
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -769,7 +793,9 @@ Std_ReturnType Csm_RandomGenerate(uint32 jobId,
 								  uint8 *resultPtr,
 								  uint32 *resultLengthPtr)
 {
-	return E_OK; 
+	Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret;  
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -809,7 +835,9 @@ Std_ReturnType Csm_KeyElementSet(uint32 keyId,
 								 uint32 keyLength)
 {
 
-	return E_OK; 
+	Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret;  
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -836,7 +864,9 @@ Std_ReturnType Csm_KeyElementSet(uint32 keyId,
  *********************************************************************************************************************/
 Std_ReturnType Csm_KeySetValid(uint32 keyId)
 {
-	return E_OK; 
+	Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret;  
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -877,7 +907,9 @@ Std_ReturnType Csm_KeyElementGet(uint32 keyId,
 								 uint8 *keyPtr,
 								 uint32 *keyLengthPtr)
 {
-	return E_OK; 
+	Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret;  
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -917,7 +949,9 @@ Std_ReturnType Csm_KeyElementCopy(const uint32 keyId,
 								  const uint32 targetKeyId,
 								  const uint32 targetKeyElementId)
 {
-	return E_OK; 
+	Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret; 
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -951,7 +985,9 @@ Std_ReturnType Csm_KeyElementCopy(const uint32 keyId,
 Std_ReturnType Csm_KeyCopy(const uint32 keyId,
 						   const uint32 targetKeyId)
 {
-	return E_OK; 
+	Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret;  
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -983,7 +1019,9 @@ Std_ReturnType Csm_RandomSeed(uint32 keyId,
 							  const uint8 *seedPtr,
 							  uint32 seedLength)
 {
-	return E_OK; 
+	Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret;  
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -1010,7 +1048,9 @@ Std_ReturnType Csm_RandomSeed(uint32 keyId,
  *********************************************************************************************************************/
 Std_ReturnType Csm_KeyGenerate(uint32 keyId)
 {
-	return E_OK; 
+	Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret;  
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -1042,7 +1082,9 @@ Std_ReturnType Csm_KeyGenerate(uint32 keyId)
 Std_ReturnType Csm_KeyDerive(uint32 keyId,
 							 uint32 targetKeyId)
 {
-	return E_OK; 
+	Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret;  
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -1079,7 +1121,9 @@ Std_ReturnType Csm_KeyExchangeCalcPubVal(uint32 keyId,
 										 uint8 *publicValuePtr,
 										 uint32 *publicValueLengthPtr)
 {
-	return E_OK; 
+	Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret;  
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -1114,7 +1158,9 @@ Std_ReturnType Csm_KeyExchangeCalcSecret(uint32 keyId,
 										 const uint8 *partnerPublicValuePtr,
 										 uint32 partnerPublicValueLength)
 {
-	return E_OK; 		
+	Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret; 		
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -1141,7 +1187,9 @@ Std_ReturnType Csm_KeyExchangeCalcSecret(uint32 keyId,
  *********************************************************************************************************************/
 Std_ReturnType Csm_CertificateParse(const uint32 keyId)
 {
-	return E_OK; 
+	Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret; 
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -1173,7 +1221,9 @@ Std_ReturnType Csm_CertificateVerify(const uint32 keyId,
 									 const uint32 verifyCryIfKeyId,
 									 Crypto_VerifyResultType *verifyPtr)
 {
-	return E_OK;                              
+	Std_ReturnType Ret = E_NOT_OK;
+
+	     return Ret;                               
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition
@@ -1204,7 +1254,7 @@ Std_ReturnType Csm_CertificateVerify(const uint32 keyId,
 Std_ReturnType Csm_CancelJob(uint32 job,
 							 Crypto_OperationModeType mode)
 {
-	return E_OK; 
+	Std_ReturnType Ret = E_NOT_OK; 
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition

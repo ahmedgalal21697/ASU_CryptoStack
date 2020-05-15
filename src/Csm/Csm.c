@@ -1255,6 +1255,7 @@ Std_ReturnType Csm_CancelJob(uint32 job,
 							 Crypto_OperationModeType mode)
 {
 	Std_ReturnType Ret = E_NOT_OK; 
+	return Ret;
 }
 /**********************************************************************************************************************
  *  LOCAL FUNCTION Definition

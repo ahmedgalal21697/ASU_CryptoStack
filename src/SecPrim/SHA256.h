@@ -12,24 +12,23 @@
 #include <stddef.h>
 
 /****************************** MACROS ******************************/
-#define SHA256_BLOCK_SIZE 32 // SHA256 outputs a 32 byte digest
+#define SHA256_BLOCK_SIZE 32            // SHA256 outputs a 32 byte digest
 
 /**************************** DATA TYPES ****************************/
-typedef unsigned char BYTE; // 8-bit byte
-typedef unsigned int WORD;	// 32-bit word, change to "long" for 16-bit machines
+typedef unsigned char uint8;             // 8-bit byte
+typedef unsigned int  uint32;             // 32-bit word, change to "long" for 16-bit machines
 
-typedef struct
-{
-	BYTE data[64];
-	WORD datalen;
+typedef struct {
+	uint8 data[64];
+	uint32 datalen;
 	unsigned long long bitlen;
-	WORD state[8];
+	uint32 state[8];
 } SHA256_CTX;
 
 /*********************** FUNCTION DECLARATIONS **********************/
 void sha256_init(SHA256_CTX *ctx);
-void sha256_update(SHA256_CTX *ctx, const BYTE data[], size_t len);
-void sha256_final(SHA256_CTX *ctx, BYTE hash[]);
-void sha256(const BYTE data[], size_t len, BYTE hash[], SHA256_CTX *ctx);
+void sha256_update(SHA256_CTX *ctx, const uint8 data[], uint32 len);
+void sha256_final(SHA256_CTX *ctx, uint8 hash[]);
+void sha256( const uint8 data[],uint32 len,uint8** hash,SHA256_CTX *ctx);
 
 #endif /* SHA256_H_ */

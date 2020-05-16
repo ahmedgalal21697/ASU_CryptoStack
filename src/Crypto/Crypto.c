@@ -16,12 +16,9 @@
 #include "CryIf.h"
 #include "Det.h"
 
-
-
 /*General API*/
 
 static boolean Cryptoinit = FALSE;
-
 
 /**********************************************************************************************************************
  *  Crypto_Init()
@@ -36,14 +33,13 @@ void Crypto_Init(void)
 
     Cryptoinit = TRUE;
 
-	if(FALSE==Cryptoinit)
-	{
-	    Det_ReportError(CRYPTO_MODULE_ID,
-	                    0,
-	                    Crypto_Init_ID,
-	                    CRYPTO_E_INIT_FAILED);
-	}
-	/*SWS_Crypto_00045 satisfied */
+    if (FALSE == Cryptoinit)
+    {
+        Det_ReportError(CRYPTO_MODULE_ID, 0,
+        Crypto_Init_ID,
+                        CRYPTO_E_INIT_FAILED);
+    }
+    /*SWS_Crypto_00045 satisfied */
 }
 
 /**********************************************************************************************************************
@@ -56,11 +52,10 @@ void Crypto_Init(void)
  *********************************************************************************************************************/
 void Crypto_GetVersionInfo(Std_VersionInfoType *versioninfo)
 {
-    if(NULL==versioninfo)
+    if (NULL == versioninfo)
     {
-        Det_ReportError(CRYPTO_MODULE_ID,
-                        0,
-                        Crypto_GetVersionInfo_ID,
+        Det_ReportError(CRYPTO_MODULE_ID, 0,
+        Crypto_GetVersionInfo_ID,
                         CRYPTO_E_PARAM_POINTER);
     }
     /*SWS_Crypto_00047 satisfied*/
@@ -86,279 +81,331 @@ void Crypto_GetVersionInfo(Std_VersionInfoType *versioninfo)
  *  \reentrant     TRUE
  *  \synchronous   Depends on the job configuration
  *********************************************************************************************************************/
-Std_ReturnType Crypto_ProcessJob(uint32 objectId,
-                                 Crypto_JobType *job)
+Std_ReturnType Crypto_ProcessJob(uint32 objectId, Crypto_JobType *job)
 {
-    Std_ReturnType ret =E_NOT_OK;
-	if (FALSE == Cryptoinit)
-	{
+    Std_ReturnType ret = E_NOT_OK;
+    boolean errorFound = FALSE;
 
-		Det_ReportError(CRYPTO_MODULE_ID,
-		                0,
-		                Crypto_ProcessJob_ID,
-		                CRYPTO_E_UNINIT);
-		ret= E_NOT_OK;
-	}
-	/*SWS_Crypto_00057 satisfied*/
+    if (FALSE == Cryptoinit)
+    {
+#if (STD_ON==CRYPTO_DEV_ERROR_DETECT)
+        Det_ReportError(CRYPTO_MODULE_ID, 0,
+        Crypto_ProcessJob_ID,
+                        CRYPTO_E_UNINIT);
+#endif
+        errorFound = TRUE;
+        ret = E_NOT_OK;
+    }
+    /*SWS_Crypto_00057 satisfied*/
 
-	else if (NULL == job)
-	{
-		Det_ReportError(CRYPTO_MODULE_ID,
-		                0,
-		                Crypto_ProcessJob_ID,
-		                CRYPTO_E_PARAM_POINTER);
-		ret= E_NOT_OK;
-	}
-	/*SWS_Crypto_00058 satisfied*/
-	else if (((job->jobPrimitiveInfo->primitiveInfo->service) > 0x0b) | ((job->jobPrimitiveInfo->primitiveInfo->service) < 0x00))
-	{
-		Det_ReportError(CRYPTO_MODULE_ID,
-		                0,
-		                Crypto_ProcessJob_ID,
-		                CRYPTO_E_PARAM_HANDLE);
-		ret= E_NOT_OK;
-	}
-	/*SWS_Crypto_00064 satisfied*/
+    else if (NULL == job)
+    {
+#if (STD_ON==CRYPTO_DEV_ERROR_DETECT)
+        Det_ReportError(CRYPTO_MODULE_ID, 0,
+        Crypto_ProcessJob_ID,
+                        CRYPTO_E_PARAM_POINTER);
+#endif
+        errorFound = TRUE;
+        ret = E_NOT_OK;
+    }
+    /*SWS_Crypto_00059 satisfied*/
+    else if (((job->jobPrimitiveInfo->primitiveInfo->service) > 0x0b)
+            | ((job->jobPrimitiveInfo->primitiveInfo->service) < 0x00))
+    {
+#if (STD_ON==CRYPTO_DEV_ERROR_DETECT)
+        Det_ReportError(CRYPTO_MODULE_ID, 0,
+        Crypto_ProcessJob_ID,
+                        CRYPTO_E_PARAM_HANDLE);
+#endif
+        errorFound = TRUE;
+        ret = E_NOT_OK;
+    }
+    /*SWS_Crypto_00064 satisfied*/
 
-
-	/*Hash*/
-
-	if (CRYPTO_HASH==(job->jobPrimitiveInfo->primitiveInfo->service) )
-	{
-	    SHA1_CTX sha1_ctx;
-	    SHA224_CTX sha224_ctx;
-	    SHA256_CTX sha256_ctx;
-	    SHA384_CTX sha384_ctx;
-	    SHA512_CTX sha512_ctx;
-	    MD5_CTX md5_ctx;
-
-		if (NULL == (job->jobPrimitiveInputOutput.inputPtr))
-		{
-			Det_ReportError(CRYPTO_MODULE_ID,
-			                0,
-			                Crypto_ProcessJob_ID,
-			                CRYPTO_E_PARAM_POINTER);
-			ret= E_NOT_OK;
-		}
-		/*SWS_Crypto_00059 satisfied*/
-
-		else if (0 == (job->jobPrimitiveInputOutput.inputLength))
-		{
-			Det_ReportError(CRYPTO_MODULE_ID,
-			                0,
-			                Crypto_ProcessJob_ID,
-			                CRYPTO_E_PARAM_VALUE);
-			ret= E_NOT_OK;
-		}
-		/*SWS_Crypto_00142 satisfied*/
-
-		else if (NULL == (job->jobPrimitiveInputOutput.outputLengthPtr))
-		{
-			Det_ReportError(CRYPTO_MODULE_ID,
-			                0,
-			                Crypto_ProcessJob_ID,
-			                CRYPTO_E_PARAM_POINTER);
-			ret= E_NOT_OK;
-		}
-		/*SWS_Crypto_00059 satisfied*/
-		/*TODO*/
-		if(0==*(job->jobPrimitiveInputOutput.outputLengthPtr))
-		{
-				Det_ReportError(CRYPTO_MODULE_ID,0,Crypto_ProcessJob_ID,   CRYPTO_E_PARAM_VALUE );
-			return E_NOT_OK;
-		}
-
-
-		/*SHA1*/
-		if (CRYPTO_ALGOFAM_SHA1==(job->jobPrimitiveInfo->primitiveInfo->algorithm.family ))
-		{
-		     /*TODO*/
-			sha1((job->jobPrimitiveInputOutput.inputPtr),
-			     (job->jobPrimitiveInputOutput.inputLength) ,
-			     job->jobPrimitiveInputOutput.outputPtr,
-			     &sha1_ctx);
-			*(job->jobPrimitiveInputOutput.outputLengthPtr) = 20;
-			ret= E_OK;
-		}
-		/*SHA224*/
-		else if (CRYPTO_ALGOFAM_SHA2_224==(job->jobPrimitiveInfo->primitiveInfo->algorithm.family ))
-		{
-		    /*TODO*/
-			sha224(job->jobPrimitiveInputOutput.inputPtr,
-			       job->jobPrimitiveInputOutput.inputLength ,
-			       job->jobPrimitiveInputOutput.outputPtr,
-			       &sha224_ctx);
-			*(job->jobPrimitiveInputOutput.outputLengthPtr) = 28;
-
-			ret= E_OK;
-		}
-		/*SHA256*/
-		else if (CRYPTO_ALGOFAM_SHA2_256==(job->jobPrimitiveInfo->primitiveInfo->algorithm.family ))
-		{
-		    /*TODO*/
-			sha256(job->jobPrimitiveInputOutput.inputPtr,
-			       job->jobPrimitiveInputOutput.inputLength,
-			       job->jobPrimitiveInputOutput.outputPtr,
-			       &sha256_ctx);
-			*(job->jobPrimitiveInputOutput.outputLengthPtr) = 32;
-
-			ret= E_OK;
-		}
-		/*SHA384*/
-		else if (CRYPTO_ALGOFAM_SHA2_384==(job->jobPrimitiveInfo->primitiveInfo->algorithm.family ))
-		{
-
-			sha384(job->jobPrimitiveInputOutput.inputPtr,
-			       job->jobPrimitiveInputOutput.inputLength,
-			       job->jobPrimitiveInputOutput.outputPtr,
-			       &sha384_ctx);
-			*(job->jobPrimitiveInputOutput.outputLengthPtr) = 48;
-
-			ret=E_OK;
-		}
-		/*SHA512*/
-		else if (CRYPTO_ALGOFAM_SHA2_512==(job->jobPrimitiveInfo->primitiveInfo->algorithm.family ))
-		{
-		    /*TODO*/
-			sha512(job->jobPrimitiveInputOutput.inputPtr,
-			       job->jobPrimitiveInputOutput.inputLength,
-			       job->jobPrimitiveInputOutput.outputPtr,
-			       &sha512_ctx);
-			*(job->jobPrimitiveInputOutput.outputLengthPtr) = 64;
-
-			ret= E_OK;
-		}
-		/*MD5*/
-		else if (CRYPTO_ALGOFAM_CUSTOM==(job->jobPrimitiveInfo->primitiveInfo->algorithm.family ))
-		{
-		    /*TODO*/
-			md5(job->jobPrimitiveInputOutput.inputPtr,
-			    job->jobPrimitiveInputOutput.inputLength,
-			    job->jobPrimitiveInputOutput.outputPtr,
-			    &md5_ctx);
-			*(job->jobPrimitiveInputOutput.outputLengthPtr) = 16;
-
-			ret= E_OK;
-		}
-		else
-		{
-			Det_ReportError(CRYPTO_MODULE_ID,
-			                0,
-			                Crypto_ProcessJob_ID,
-			                CRYPTO_E_PARAM_HANDLE);
-			ret= E_NOT_OK;
-		}
-		/*SWS_Crypto_00067 satisfied*/
-	}
-
-	if (CRYPTO_ENCRYPT==(job->jobPrimitiveInfo->primitiveInfo->service ))
-	{
-
-        if (NULL == (job->jobPrimitiveInputOutput.inputPtr))
+    /*Hash*/
+    if (FALSE == errorFound)
+    {
+        if (CRYPTO_HASH == (job->jobPrimitiveInfo->primitiveInfo->service))
         {
-            Det_ReportError(CRYPTO_MODULE_ID,
-                            0,
-                            Crypto_ProcessJob_ID,
-                            CRYPTO_E_PARAM_POINTER);
-            ret= E_NOT_OK;
-        }
-        /*SWS_Crypto_00059 satisfied*/
 
-        else if (0 == (job->jobPrimitiveInputOutput.inputLength))
+            if (NULL == (job->jobPrimitiveInputOutput.inputPtr))
+            {
+#if (STD_ON==CRYPTO_DEV_ERROR_DETECT)
+                Det_ReportError(CRYPTO_MODULE_ID, 0,
+                Crypto_ProcessJob_ID,
+                                CRYPTO_E_PARAM_POINTER);
+#endif
+
+                ret = E_NOT_OK;
+            }
+            /*SWS_Crypto_00059 satisfied*/
+
+            else if (0 == (job->jobPrimitiveInputOutput.inputLength))
+            {
+#if (STD_ON==CRYPTO_DEV_ERROR_DETECT)
+                Det_ReportError(CRYPTO_MODULE_ID, 0,
+                Crypto_ProcessJob_ID,
+                                CRYPTO_E_PARAM_VALUE);
+#endif
+                ret = E_NOT_OK;
+            }
+            /*SWS_Crypto_00142 satisfied*/
+
+            else if (NULL == (job->jobPrimitiveInputOutput.outputLengthPtr))
+            {
+#if (STD_ON==CRYPTO_DEV_ERROR_DETECT)
+                Det_ReportError(CRYPTO_MODULE_ID, 0,
+                Crypto_ProcessJob_ID,
+                                CRYPTO_E_PARAM_POINTER);
+#endif
+                ret = E_NOT_OK;
+            }
+
+            /*SWS_Crypto_00059 satisfied*/
+
+            else if (0 == *(job->jobPrimitiveInputOutput.outputLengthPtr))
+            {
+#if (STD_ON==CRYPTO_DEV_ERROR_DETECT)
+                Det_ReportError(CRYPTO_MODULE_ID, 0,
+                Crypto_ProcessJob_ID,
+                                CRYPTO_E_PARAM_VALUE);
+#endif
+                ret = E_NOT_OK;
+            }
+            /*SWS_Crypto_00142 satisfied*/
+            else if (NULL == (job->jobPrimitiveInputOutput.outputPtr))
+            {
+#if (STD_ON==CRYPTO_DEV_ERROR_DETECT)
+                Det_ReportError(CRYPTO_MODULE_ID, 0,
+                Crypto_ProcessJob_ID,
+                                CRYPTO_E_PARAM_POINTER);
+#endif
+                ret = E_NOT_OK;
+
+            }
+            /*SWS_Crypto_00070 satisfied*/
+
+            /*SHA1*/
+            else if (CRYPTO_ALGOFAM_SHA1
+                    == (job->jobPrimitiveInfo->primitiveInfo->algorithm.family))
+            {
+
+                if (*(job->jobPrimitiveInputOutput.outputLengthPtr) < 20)
+                {
+                    ret = CRYPTO_E_RE_SMALL_BUFFER;
+                }
+                /*SWS_Crypto_00136 satisfied*/
+                else
+                {
+                    /*call the algorithm*/
+                    *(job->jobPrimitiveInputOutput.outputLengthPtr) = 20;
+                    ret = E_OK;
+                }
+            }
+            /*SHA224*/
+            else if (CRYPTO_ALGOFAM_SHA2_224
+                    == (job->jobPrimitiveInfo->primitiveInfo->algorithm.family))
+            {
+                if (*(job->jobPrimitiveInputOutput.outputLengthPtr) < 28)
+                {
+                    ret = CRYPTO_E_RE_SMALL_BUFFER;
+                }
+                /*SWS_Crypto_00136 satisfied*/
+                else
+                {
+                    /*call the algorithm*/
+                    *(job->jobPrimitiveInputOutput.outputLengthPtr) = 28;
+
+                    ret = E_OK;
+                }
+            }
+            /*SHA256*/
+            else if (CRYPTO_ALGOFAM_SHA2_256
+                    == (job->jobPrimitiveInfo->primitiveInfo->algorithm.family))
+            {
+                if (*(job->jobPrimitiveInputOutput.outputLengthPtr) < 32)
+                {
+                    ret = CRYPTO_E_RE_SMALL_BUFFER;
+                }
+                /*SWS_Crypto_00136 satisfied*/
+                else
+                {
+                    /*call the algorithm*/
+                    *(job->jobPrimitiveInputOutput.outputLengthPtr) = 32;
+                }
+                ret = E_OK;
+            }
+            /*SHA384*/
+            else if (CRYPTO_ALGOFAM_SHA2_384
+                    == (job->jobPrimitiveInfo->primitiveInfo->algorithm.family))
+            {
+
+                if (*(job->jobPrimitiveInputOutput.outputLengthPtr) < 48)
+                {
+                    ret = CRYPTO_E_RE_SMALL_BUFFER;
+                }
+                /*SWS_Crypto_00136 satisfied*/
+                else
+                {
+                    /*call the algorithm*/
+                    *(job->jobPrimitiveInputOutput.outputLengthPtr) = 48;
+
+                    ret = E_OK;
+                }
+            }
+            /*SHA512*/
+            else if (CRYPTO_ALGOFAM_SHA2_512
+                    == (job->jobPrimitiveInfo->primitiveInfo->algorithm.family))
+            {
+                if (*(job->jobPrimitiveInputOutput.outputLengthPtr) < 64)
+                {
+                    ret = CRYPTO_E_RE_SMALL_BUFFER;
+                }
+                /*SWS_Crypto_00136 satisfied*/
+                else
+                {
+                    /*call the algorithm*/
+                    *(job->jobPrimitiveInputOutput.outputLengthPtr) = 64;
+
+                    ret = E_OK;
+                }
+            }
+            /*MD5*/
+            else if (CRYPTO_ALGOFAM_CUSTOM
+                    == (job->jobPrimitiveInfo->primitiveInfo->algorithm.family))
+            {
+                if (*(job->jobPrimitiveInputOutput.outputLengthPtr) < 16)
+                {
+                    ret = CRYPTO_E_RE_SMALL_BUFFER;
+                }
+                /*SWS_Crypto_00136 satisfied*/
+                else
+                {
+                    /*call the algorithm*/
+                    *(job->jobPrimitiveInputOutput.outputLengthPtr) = 16;
+
+                    ret = E_OK;
+                }
+            }
+            else
+            {
+#if (STD_ON==CRYPTO_DEV_ERROR_DETECT)
+
+                Det_ReportError(CRYPTO_MODULE_ID, 0,
+                Crypto_ProcessJob_ID,
+                                CRYPTO_E_PARAM_HANDLE);
+#endif
+                ret = E_NOT_OK;
+            }
+            /*SWS_Crypto_00067 satisfied*/
+        }
+
+        else if (CRYPTO_ENCRYPT
+                == (job->jobPrimitiveInfo->primitiveInfo->service))
         {
-            Det_ReportError(CRYPTO_MODULE_ID,
-                            0,
-                            Crypto_ProcessJob_ID,
-                            CRYPTO_E_PARAM_VALUE);
-            ret= E_NOT_OK;
-        }
-        /*SWS_Crypto_00142 satisfied*/
 
-        else if (NULL == (job->jobPrimitiveInputOutput.outputLengthPtr))
+            if (NULL == (job->jobPrimitiveInputOutput.inputPtr))
+            {
+                Det_ReportError(CRYPTO_MODULE_ID, 0,
+                Crypto_ProcessJob_ID,
+                                CRYPTO_E_PARAM_POINTER);
+                ret = E_NOT_OK;
+            }
+            /*SWS_Crypto_00059 satisfied*/
+
+            else if (0 == (job->jobPrimitiveInputOutput.inputLength))
+            {
+                Det_ReportError(CRYPTO_MODULE_ID, 0,
+                Crypto_ProcessJob_ID,
+                                CRYPTO_E_PARAM_VALUE);
+                ret = E_NOT_OK;
+            }
+            /*SWS_Crypto_00142 satisfied*/
+
+            else if (NULL == (job->jobPrimitiveInputOutput.outputLengthPtr))
+            {
+                Det_ReportError(CRYPTO_MODULE_ID, 0,
+                Crypto_ProcessJob_ID,
+                                CRYPTO_E_PARAM_POINTER);
+                ret = E_NOT_OK;
+            }
+            /*SWS_Crypto_00059 satisfied*/
+
+            if (CRYPTO_ALGOFAM_3DES
+                    == (job->jobPrimitiveInfo->primitiveInfo->algorithm.family))
+            {
+            }
+            else if (CRYPTO_ALGOFAM_AES
+                    == (job->jobPrimitiveInfo->primitiveInfo->algorithm.family))
+            {
+            }
+            else
+            {
+                Det_ReportError(CRYPTO_MODULE_ID, 0,
+                Crypto_ProcessJob_ID,
+                                CRYPTO_E_PARAM_HANDLE);
+                ret = E_NOT_OK;
+            }
+            /*SWS_Crypto_00067 satisfied*/
+        }
+
+        else if (CRYPTO_DECRYPT
+                == (job->jobPrimitiveInfo->primitiveInfo->service))
         {
-            Det_ReportError(CRYPTO_MODULE_ID,
-                            0,
-                            Crypto_ProcessJob_ID,
-                            CRYPTO_E_PARAM_POINTER);
-            ret= E_NOT_OK;
+
+            if (NULL == (job->jobPrimitiveInputOutput.inputPtr))
+            {
+                Det_ReportError(CRYPTO_MODULE_ID, 0,
+                Crypto_ProcessJob_ID,
+                                CRYPTO_E_PARAM_POINTER);
+                ret = E_NOT_OK;
+            }
+            /*SWS_Crypto_00059 satisfied*/
+
+            else if (0 == (job->jobPrimitiveInputOutput.inputLength))
+            {
+                Det_ReportError(CRYPTO_MODULE_ID, 0,
+                Crypto_ProcessJob_ID,
+                                CRYPTO_E_PARAM_VALUE);
+                ret = E_NOT_OK;
+            }
+            /*SWS_Crypto_00142 satisfied*/
+
+            else if (NULL == (job->jobPrimitiveInputOutput.outputLengthPtr))
+            {
+                Det_ReportError(CRYPTO_MODULE_ID, 0,
+                Crypto_ProcessJob_ID,
+                                CRYPTO_E_PARAM_POINTER);
+                ret = E_NOT_OK;
+            }
+            /*SWS_Crypto_00059 satisfied*/
+
+            if (CRYPTO_ALGOFAM_3DES
+                    == (job->jobPrimitiveInfo->primitiveInfo->algorithm.family))
+            {
+            }
+            else if (CRYPTO_ALGOFAM_AES
+                    == (job->jobPrimitiveInfo->primitiveInfo->algorithm.family))
+            {
+            }
+            else
+            {
+                Det_ReportError(CRYPTO_MODULE_ID, 0,
+                Crypto_ProcessJob_ID,
+                                CRYPTO_E_PARAM_HANDLE);
+                ret = E_NOT_OK;
+            }
+            /*SWS_Crypto_00067 satisfied*/
         }
-        /*SWS_Crypto_00059 satisfied*/
+    }
+    else if (TRUE == errorFound)
+    {
 
+    }
 
-
-		 if (CRYPTO_ALGOFAM_3DES==(job->jobPrimitiveInfo->primitiveInfo->algorithm.family ))
-		 {
-		 }
-		 else if (CRYPTO_ALGOFAM_AES==(job->jobPrimitiveInfo->primitiveInfo->algorithm.family ))
-		 {
-		 }
-		 else
-		 {
-		      Det_ReportError(CRYPTO_MODULE_ID,
-		                      0,
-		                      Crypto_ProcessJob_ID,
-		                      CRYPTO_E_PARAM_HANDLE);
-		      ret= E_NOT_OK;
-		 }
-		 /*SWS_Crypto_00067 satisfied*/
-	}
-
-	if ( CRYPTO_DECRYPT==(job->jobPrimitiveInfo->primitiveInfo->service ))
-	{
-
-
-        if (NULL == (job->jobPrimitiveInputOutput.inputPtr))
-        {
-            Det_ReportError(CRYPTO_MODULE_ID,
-                            0,
-                            Crypto_ProcessJob_ID,
-                            CRYPTO_E_PARAM_POINTER);
-            ret= E_NOT_OK;
-        }
-        /*SWS_Crypto_00059 satisfied*/
-
-        else if (0 == (job->jobPrimitiveInputOutput.inputLength))
-        {
-            Det_ReportError(CRYPTO_MODULE_ID,
-                            0,
-                            Crypto_ProcessJob_ID,
-                            CRYPTO_E_PARAM_VALUE);
-            ret= E_NOT_OK;
-        }
-        /*SWS_Crypto_00142 satisfied*/
-
-        else if (NULL == (job->jobPrimitiveInputOutput.outputLengthPtr))
-        {
-            Det_ReportError(CRYPTO_MODULE_ID,
-                            0,
-                            Crypto_ProcessJob_ID,
-                            CRYPTO_E_PARAM_POINTER);
-            ret= E_NOT_OK;
-        }
-        /*SWS_Crypto_00059 satisfied*/
-
-
-
-         if (CRYPTO_ALGOFAM_3DES==(job->jobPrimitiveInfo->primitiveInfo->algorithm.family ))
-         {
-         }
-         else if (CRYPTO_ALGOFAM_AES==(job->jobPrimitiveInfo->primitiveInfo->algorithm.family ))
-         {
-         }
-         else
-         {
-              Det_ReportError(CRYPTO_MODULE_ID,
-                              0,
-                              Crypto_ProcessJob_ID,
-                              CRYPTO_E_PARAM_HANDLE);
-              ret= E_NOT_OK;
-         }
-         /*SWS_Crypto_00067 satisfied*/
-	}
-	return ret;
+    return ret;
 }
 /*Job Cancellation Interface*/
-
 
 /**********************************************************************************************************************
  *  Crypto_CancelJob()
@@ -376,44 +423,41 @@ Std_ReturnType Crypto_ProcessJob(uint32 objectId,
 
 Std_ReturnType Crypto_CancelJob(uint32 objectId, Crypto_JobInfoType *job)
 {
-    Std_ReturnType ret=E_NOT_OK;
+    Std_ReturnType ret = E_NOT_OK;
 
-	if (FALSE == Cryptoinit)
-	{
+    if (FALSE == Cryptoinit)
+    {
 
-		Det_ReportError(CRYPTO_MODULE_ID,
-		                0,
-		                Crypto_ProcessJob_ID,
-		                CRYPTO_E_UNINIT);
-		ret= E_NOT_OK;
+        Det_ReportError(CRYPTO_MODULE_ID, 0,
+        Crypto_ProcessJob_ID,
+                        CRYPTO_E_UNINIT);
+        ret = E_NOT_OK;
 
-	}
-	/*SWS_Crypto_00123 satisfied*/
+    }
+    /*SWS_Crypto_00123 satisfied*/
 
-	else if (NULL == job)
-	{
-		Det_ReportError(CRYPTO_MODULE_ID,
-		                0,
-		                Crypto_ProcessJob_ID,
-		                CRYPTO_E_PARAM_POINTER);
-		ret= E_NOT_OK;
-	}
-	/*SWS_Crypto_00125 satisfied*/
+    else if (NULL == job)
+    {
+        Det_ReportError(CRYPTO_MODULE_ID, 0,
+        Crypto_ProcessJob_ID,
+                        CRYPTO_E_PARAM_POINTER);
+        ret = E_NOT_OK;
+    }
+    /*SWS_Crypto_00125 satisfied*/
 
-	else if (objectId > Objects)
-	{
-		Det_ReportError(CRYPTO_MODULE_ID,
-		                0,
-		                Crypto_ProcessJob_ID,
-		                CRYPTO_E_PARAM_HANDLE);
-		ret= E_NOT_OK;
-	}
-	/*SWS_Crypto_00124 satisfied*/
-	else
-	{
-		ret= CRYPTO_E_JOB_CANCELED;
-	}
-	return ret;
+    else if (objectId > Objects)
+    {
+        Det_ReportError(CRYPTO_MODULE_ID, 0,
+        Crypto_ProcessJob_ID,
+                        CRYPTO_E_PARAM_HANDLE);
+        ret = E_NOT_OK;
+    }
+    /*SWS_Crypto_00124 satisfied*/
+    else
+    {
+        ret = CRYPTO_E_JOB_CANCELED;
+    }
+    return ret;
 }
 /*Key Setting Interface*/
 
@@ -434,96 +478,93 @@ Std_ReturnType Crypto_CancelJob(uint32 objectId, Crypto_JobInfoType *job)
  *  \reentrant     FALSE
  *  \synchronous   TRUE
  *********************************************************************************************************************/
-Std_ReturnType Crypto_KeyElementSet(uint32 cryptoKeyId, uint32 keyElementId, const uint8 *keyPtr, uint32 keyLength)
+Std_ReturnType Crypto_KeyElementSet(uint32 cryptoKeyId, uint32 keyElementId,
+                                    const uint8 *keyPtr, uint32 keyLength)
 {
-    Std_ReturnType ret =E_NOT_OK;
-	uint32 current=0;
-	uint8 keyflag = 0;
-	uint8 keyelementflag = 0;
-	for (uint32 i = 0; i < Keys; i++)
-	{
-		if (CryptoKeys[i].CryptoKeyId == cryptoKeyId)
-		{
-			current = i;
-			keyflag = 1;
-			break;
-		}
-	}
+    Std_ReturnType ret = E_NOT_OK;
+    uint32 current = 0;
+    uint8 keyflag = 0;
+    uint8 keyelementflag = 0;
+    for (uint32 i = 0; i < Keys; i++)
+    {
+        if (CryptoKeys[i].CryptoKeyId == cryptoKeyId)
+        {
+            current = i;
+            keyflag = 1;
+            break;
+        }
+    }
 
+    for (uint32 i = 0; i < KeyTypes; i++)
+    {
+        if (CryptoKeyTypes[i].CryptoKeyTypeId
+                == (CryptoKeys[current].CryptoKeyTypeRef))
 
-	for (uint32 i = 0; i < KeyTypes; i++)
-	{
-		if (CryptoKeyTypes[i].CryptoKeyTypeId == (CryptoKeys[current].CryptoKeyTypeRef))
+        {
+            current = i;
+            break;
+        }
+    }
+    /*check for the keyelement id within the keyelement reference*/
+    for (uint32 i =
+            CryptoKeyTypes[current].CryptoKeyElementRef.StartingKeyElementIDx;
+            i < CryptoKeyTypes[current].CryptoKeyElementRef.EndingKeyElementIDx;
+            i++)
+    {
+        if (CryptoKeyElements[i].CryptoKeyElementId == keyElementId)
 
-		{
-			current = i;
-			break;
-		}
-	}
-	/*check for the keyelement id within the keyelement reference*/
-	for (uint32 i = CryptoKeyTypes[current].CryptoKeyElementRef.StartingKeyElementIDx;
-	        i < CryptoKeyTypes[current].CryptoKeyElementRef.EndingKeyElementIDx;
-	        i++)
-	{
-		if (CryptoKeyElements[i].CryptoKeyElementId == keyElementId)
+        {
+            current = i;
+            keyelementflag = 1;
+            break;
 
-		{
-			current = i;
-			keyelementflag = 1;
-			break;
-
-		}
-	}
+        }
+    }
 #if (CRYPTO_DEV_ERROR_DETECT == STD_ON)
-	if (FALSE == Cryptoinit)
-	{
+    if (FALSE == Cryptoinit)
+    {
 
-		Det_ReportError(CRYPTO_MODULE_ID,
-		                0,
-		                Crypto_KeyElementSet_ID,
-		                CRYPTO_E_UNINIT);
-		ret= E_NOT_OK;
-	}
-	/*SWS_Crypto_00075 satisfied*/
-	else if (0 == keyflag)
-	{
-		Det_ReportError(CRYPTO_MODULE_ID,
-		                0,
-		                Crypto_KeyElementSet_ID,
-		                CRYPTO_E_PARAM_HANDLE);
-		ret= E_NOT_OK;
-	}
-	/*SWS_Crypto_00076 satisfied*/
-	else if (0 == keyelementflag)
-	{
-		Det_ReportError(CRYPTO_MODULE_ID,
-		                0,
-		                Crypto_KeyElementSet_ID,
-		                CRYPTO_E_PARAM_HANDLE);
-		ret= E_NOT_OK;
-	}
-	/*SWS_Crypto_00077 satisfied*/
-	else if (0 == keyLength)
-	{
-		Det_ReportError(CRYPTO_MODULE_ID,
-		                0,
-		                Crypto_KeyElementSet_ID,
-		                CRYPTO_E_PARAM_VALUE);
-		ret= E_NOT_OK;
-	}
-	/*SWS_Crypto_00079 satisfied*/
-	else if (NULL == keyPtr)
-	{
-		Det_ReportError(CRYPTO_MODULE_ID,
-		                0,
-		                Crypto_KeyElementSet_ID,
-		                CRYPTO_E_PARAM_POINTER);
-		ret= E_NOT_OK;
-	}
-	/*SWS_Crypto_00078*/
+        Det_ReportError(CRYPTO_MODULE_ID, 0,
+        Crypto_KeyElementSet_ID,
+                        CRYPTO_E_UNINIT);
+        ret = E_NOT_OK;
+    }
+    /*SWS_Crypto_00075 satisfied*/
+    else if (0 == keyflag)
+    {
+        Det_ReportError(CRYPTO_MODULE_ID, 0,
+        Crypto_KeyElementSet_ID,
+                        CRYPTO_E_PARAM_HANDLE);
+        ret = E_NOT_OK;
+    }
+    /*SWS_Crypto_00076 satisfied*/
+    else if (0 == keyelementflag)
+    {
+        Det_ReportError(CRYPTO_MODULE_ID, 0,
+        Crypto_KeyElementSet_ID,
+                        CRYPTO_E_PARAM_HANDLE);
+        ret = E_NOT_OK;
+    }
+    /*SWS_Crypto_00077 satisfied*/
+    else if (0 == keyLength)
+    {
+        Det_ReportError(CRYPTO_MODULE_ID, 0,
+        Crypto_KeyElementSet_ID,
+                        CRYPTO_E_PARAM_VALUE);
+        ret = E_NOT_OK;
+    }
+    /*SWS_Crypto_00079 satisfied*/
+    else if (NULL == keyPtr)
+    {
+        Det_ReportError(CRYPTO_MODULE_ID, 0,
+        Crypto_KeyElementSet_ID,
+                        CRYPTO_E_PARAM_POINTER);
+        ret = E_NOT_OK;
+    }
+    /*SWS_Crypto_00078*/
 
 #endif
-	return ret;
+    return ret;
 }
 
 /**********************************************************************************************************************
@@ -538,8 +579,9 @@ Std_ReturnType Crypto_KeyElementSet(uint32 cryptoKeyId, uint32 keyElementId, con
  *  \synchronous   FALSE
  *********************************************************************************************************************/
 Std_ReturnType Crypto_KeySetValid(uint32 cryptoKeyId)
-{ Std_ReturnType ret=E_NOT_OK;
-return ret;
+{
+    Std_ReturnType ret = E_NOT_OK;
+    return ret;
 }
 
 /*Key Extraction Interface*/
@@ -548,9 +590,9 @@ return ret;
  *  Crypto_KeyElementGet()
  *********************************************************************************************************************/
 /*! \brief         This interface shall be used to get a key element of the key identified by the cryptoKeyId and
-                   store the key element in the memory location pointed by the result pointer.
-                   If the actual key element is directly mapped to flash memory, there could be a bigger delay
-                   when calling this function (synchronous operation).
+ store the key element in the memory location pointed by the result pointer.
+ If the actual key element is directly mapped to flash memory, there could be a bigger delay
+ when calling this function (synchronous operation).
  *  \param[in]     cryptoKeyId             Holds the identifier of the key whose key element shall be returned.
  *  \param[in]     keyElementId            Holds the identifier of the key element which shall be returned.
  *  \param[in,out] resultLengthPtr         Holds a pointer to a memory location in which the length information is stored.
@@ -568,9 +610,10 @@ return ret;
  *  \reentrant     TRUE
  *  \synchronous   TRUE
  *********************************************************************************************************************/
-Std_ReturnType Crypto_KeyElementGet(uint32 cryptoKeyId, uint32 keyElementId, uint8 *resultPtr, uint32 *resultLengthPtr)
+Std_ReturnType Crypto_KeyElementGet(uint32 cryptoKeyId, uint32 keyElementId,
+                                    uint8 *resultPtr, uint32 *resultLengthPtr)
 {
-    Std_ReturnType ret=E_NOT_OK;
+    Std_ReturnType ret = E_NOT_OK;
     return ret;
 }
 /*Key Copying Interface*/
@@ -595,13 +638,14 @@ Std_ReturnType Crypto_KeyElementGet(uint32 cryptoKeyId, uint32 keyElementId, uin
  *  \reentrant     TRUE, but not for the same cryptoKeyId
  *  \synchronous   TRUE
  *********************************************************************************************************************/
-Std_ReturnType Crypto_KeyElementCopy(uint32 cryptoKeyId, uint32 keyElementId, uint32 targetCryptoKeyId, uint32 targetKeyElementId)
+Std_ReturnType Crypto_KeyElementCopy(uint32 cryptoKeyId, uint32 keyElementId,
+                                     uint32 targetCryptoKeyId,
+                                     uint32 targetKeyElementId)
 {
-    Std_ReturnType ret=E_NOT_OK;
-        return ret;
+    Std_ReturnType ret = E_NOT_OK;
+    return ret;
 
 }
-
 
 /**********************************************************************************************************************
  *  Crypto_KeyCopy()
@@ -623,11 +667,10 @@ Std_ReturnType Crypto_KeyElementCopy(uint32 cryptoKeyId, uint32 keyElementId, ui
  *********************************************************************************************************************/
 Std_ReturnType Crypto_KeyCopy(uint32 cryptoKeyId, uint32 targetCryptoKeyId)
 {
-    Std_ReturnType ret=E_NOT_OK;
-        return ret;
+    Std_ReturnType ret = E_NOT_OK;
+    return ret;
 
 }
-
 
 /**********************************************************************************************************************
  *  Crypto_KeyElementIdsGet()
@@ -645,10 +688,12 @@ Std_ReturnType Crypto_KeyCopy(uint32 cryptoKeyId, uint32 targetCryptoKeyId)
  *  \reentrant     TRUE, but not for the same cryptoKeyId
  *  \synchronous   TRUE
  *********************************************************************************************************************/
-Std_ReturnType Crypto_KeyElementIdsGet(uint32 cryptoKeyId, uint32 *keyElementIdsPtr, uint32 *keyElementIdsLengthPtr)
+Std_ReturnType Crypto_KeyElementIdsGet(uint32 cryptoKeyId,
+                                       uint32 *keyElementIdsPtr,
+                                       uint32 *keyElementIdsLengthPtr)
 {
-    Std_ReturnType ret=E_NOT_OK;
-        return ret;
+    Std_ReturnType ret = E_NOT_OK;
+    return ret;
 
 }
 /*Key Generation Interface*/
@@ -666,13 +711,13 @@ Std_ReturnType Crypto_KeyElementIdsGet(uint32 cryptoKeyId, uint32 *keyElementIds
  *  \reentrant     TRUE, but not for the same cryptoKeyId
  *  \synchronous   TRUE
  *********************************************************************************************************************/
-Std_ReturnType Crypto_RandomSeed(uint32 cryptoKeyId, const uint8 *seedPtr, uint32 seedLength)
+Std_ReturnType Crypto_RandomSeed(uint32 cryptoKeyId, const uint8 *seedPtr,
+                                 uint32 seedLength)
 {
-    Std_ReturnType ret=E_NOT_OK;
-        return ret;
+    Std_ReturnType ret = E_NOT_OK;
+    return ret;
 
 }
-
 
 /**********************************************************************************************************************
  *  Crypto_KeyGenerate()
@@ -687,8 +732,8 @@ Std_ReturnType Crypto_RandomSeed(uint32 cryptoKeyId, const uint8 *seedPtr, uint3
  *********************************************************************************************************************/
 Std_ReturnType Crypto_KeyGenerate(uint32 cryptoKeyId)
 {
-    Std_ReturnType ret=E_NOT_OK;
-        return ret;
+    Std_ReturnType ret = E_NOT_OK;
+    return ret;
 
 }
 
@@ -711,12 +756,11 @@ Std_ReturnType Crypto_KeyGenerate(uint32 cryptoKeyId)
  *********************************************************************************************************************/
 Std_ReturnType Crypto_KeyDerive(uint32 cryptoKeyId, uint32 targetCryptoKeyId)
 {
-    Std_ReturnType ret=E_NOT_OK;
-        return ret;
+    Std_ReturnType ret = E_NOT_OK;
+    return ret;
 
 }
 /*Key Exchange Interface*/
-
 
 /**********************************************************************************************************************
  *  Crypto_KeyExchangeCalcPubVal()
@@ -735,10 +779,12 @@ Std_ReturnType Crypto_KeyDerive(uint32 cryptoKeyId, uint32 targetCryptoKeyId)
  *  \reentrant     TRUE, but not for the same cryptoKeyId
  *  \synchronous   TRUE
  *********************************************************************************************************************/
-Std_ReturnType Crypto_KeyExchangeCalcPubVal(uint32 cryptoKeyId, uint8 *publicValuePtr, uint32 *publicValueLengthPtr)
+Std_ReturnType Crypto_KeyExchangeCalcPubVal(uint32 cryptoKeyId,
+                                            uint8 *publicValuePtr,
+                                            uint32 *publicValueLengthPtr)
 {
-    Std_ReturnType ret=E_NOT_OK;
-        return ret;
+    Std_ReturnType ret = E_NOT_OK;
+    return ret;
 
 }
 
@@ -757,10 +803,12 @@ Std_ReturnType Crypto_KeyExchangeCalcPubVal(uint32 cryptoKeyId, uint8 *publicVal
  *  \reentrant     TRUE, but not for the same cryptoKeyId
  *  \synchronous   TRUE
  *********************************************************************************************************************/
-Std_ReturnType Crypto_KeyExchangeCalcSecret(uint32 cryptoKeyId, const uint8 *partnerPublicValuePtr, uint32 partnerPublicValueLength)
+Std_ReturnType Crypto_KeyExchangeCalcSecret(uint32 cryptoKeyId,
+                                            const uint8 *partnerPublicValuePtr,
+                                            uint32 partnerPublicValueLength)
 {
-    Std_ReturnType ret=E_NOT_OK;
-        return ret;
+    Std_ReturnType ret = E_NOT_OK;
+    return ret;
 
 }
 /*Certificate Interface*/
@@ -780,8 +828,8 @@ Std_ReturnType Crypto_KeyExchangeCalcSecret(uint32 cryptoKeyId, const uint8 *par
 
 Std_ReturnType Crypto_CertificateParse(uint32 cryptoKeyId)
 {
-    Std_ReturnType ret=E_NOT_OK;
-        return ret;
+    Std_ReturnType ret = E_NOT_OK;
+    return ret;
 
 }
 
@@ -799,14 +847,15 @@ Std_ReturnType Crypto_CertificateParse(uint32 cryptoKeyId)
  *  \synchronous   TRUE
  *********************************************************************************************************************/
 
-Std_ReturnType Crypto_CertificateVerify(uint32 cryptoKeyId, uint32 verifyCryptoKeyId, Crypto_VerifyResultType *verifyPtr)
+Std_ReturnType Crypto_CertificateVerify(uint32 cryptoKeyId,
+                                        uint32 verifyCryptoKeyId,
+                                        Crypto_VerifyResultType *verifyPtr)
 {
-    Std_ReturnType ret=E_NOT_OK;
-        return ret;
+    Std_ReturnType ret = E_NOT_OK;
+    return ret;
 
 }
 /*Main function*/
-
 
 /**********************************************************************************************************************
  *  Crypto_MainFunction()

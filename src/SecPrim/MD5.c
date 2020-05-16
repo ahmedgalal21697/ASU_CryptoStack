@@ -32,9 +32,9 @@
                             a = b + ROTLEFT(a,s); }
 
 /*********************** FUNCTION DEFINITIONS ***********************/
-void md5_transform(MD5_CTX *ctx, const MD5_BYTE data[])
+void md5_transform(MD5_CTX *ctx, const uint8 data[])
 {
-	MD5_WORD a, b, c, d, m[16], i, j;
+	uint32 a, b, c, d, m[16], i, j;
 
 	// MD5 specifies big endian byte order, but this implementation assumes a little
 	// endian byte order CPU. Reverse all the bytes upon input, and re-reverse them
@@ -131,9 +131,9 @@ void md5_init(MD5_CTX *ctx)
 	ctx->state[3] = 0x10325476;
 }
 
-void md5_update(MD5_CTX *ctx, const MD5_BYTE data[], size_t len)
+void md5_update(MD5_CTX *ctx, const uint8 data[], uint32 len)
 {
-	size_t i;
+	uint32 i;
 
 	for (i = 0; i < len; ++i) {
 		ctx->data[ctx->datalen] = data[i];
@@ -146,9 +146,9 @@ void md5_update(MD5_CTX *ctx, const MD5_BYTE data[], size_t len)
 	}
 }
 
-void md5_final(MD5_CTX *ctx, MD5_BYTE hash[])
+void md5_final(MD5_CTX *ctx, uint8 hash[])
 {
-	size_t i;
+	uint32 i;
 
 	i = ctx->datalen;
 
@@ -165,7 +165,7 @@ void md5_final(MD5_CTX *ctx, MD5_BYTE hash[])
 			ctx->data[i++] = 0x00;
 		md5_transform(ctx, ctx->data);
 		//memset(ctx->data, 0, 56);
-		for (int j = 0; j < 56; j++)
+		for (uint32 j = 0; j < 56; j++)
 				{
 					ctx -> data[j] = 0;
 				}
@@ -192,7 +192,7 @@ void md5_final(MD5_CTX *ctx, MD5_BYTE hash[])
 		hash[i + 12] = (ctx->state[3] >> (i * 8)) & 0x000000ff;
 	}
 }
-void md5( const MD5_BYTE data[],size_t len,MD5_BYTE hash[],MD5_CTX *ctx)
+void md5( const uint8 data[],uint32 len,uint8 hash[],MD5_CTX *ctx)
 {
 
 	md5_init(ctx);

@@ -10,26 +10,24 @@
 
 /*************************** HEADER FILES ***************************/
 #include <stddef.h>
-
+#include "Platform_Types.h"
 /****************************** MACROS ******************************/
 #define MD5_BLOCK_SIZE 16               // MD5 outputs a 16 byte digest
 
 /**************************** DATA TYPES ****************************/
-typedef unsigned char MD5_BYTE;             // 8-bit byte
-typedef unsigned int  MD5_WORD;             // 32-bit word, change to "long" for 16-bit machines
 
 typedef struct {
-   MD5_BYTE data[64];
-   MD5_WORD datalen;
-   unsigned long long bitlen;
-   MD5_WORD state[4];
+   uint8 data[64];
+   uint32 datalen;
+   uint64 bitlen;
+   uint32 state[4];
 } MD5_CTX;
 
 /*********************** FUNCTION DECLARATIONS **********************/
 void md5_init(MD5_CTX *ctx);
-void md5_update(MD5_CTX *ctx, const MD5_BYTE data[], size_t len);
-void md5_final(MD5_CTX *ctx, MD5_BYTE hash[]);
-void md5( const MD5_BYTE data[],size_t len,MD5_BYTE hash[],MD5_CTX *ctx);
+void md5_update(MD5_CTX *ctx, const uint8 data[], uint32 len);
+void md5_final(MD5_CTX *ctx, uint8 hash[]);
+void md5( const uint8 data[],uint32 len,uint8 hash[],MD5_CTX *ctx);
 
 
 

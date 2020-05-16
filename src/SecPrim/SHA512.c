@@ -180,9 +180,9 @@ void sha512_init(SHA512_CTX *ctx)
 	ctx->state[7] = 0x5BE0CD19137E2179;
 }
 
-void sha512_update(SHA512_CTX *ctx, const uint8 data[], size_t len)
+void sha512_update(SHA512_CTX *ctx, const uint8 data[], uint64 len)
 {
-	size_t fill;
+	uint64 fill;
 	uint32 left;
 	if (len == 0)
 	{
@@ -235,7 +235,7 @@ void sha512_final(SHA512_CTX *ctx, uint8 hash[])
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-	size_t last, padn;
+	uint64 last, padn;
 	uint64 high, low;
 	uint8 msglen[16];
 
@@ -245,7 +245,7 @@ void sha512_final(SHA512_CTX *ctx, uint8 hash[])
 	PUT_UINT64_BE(high, msglen, 0);
 	PUT_UINT64_BE(low, msglen, 8);
 
-	last = (size_t)(ctx->datalen[0] & 0x7F);
+	last = (uint64)(ctx->datalen[0] & 0x7F);
 	padn = (last < 112) ? (112 - last) : (240 - last);
 
 	sha512_update(ctx, sha512_padding, padn);

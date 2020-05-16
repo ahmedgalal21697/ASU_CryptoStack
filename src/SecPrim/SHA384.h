@@ -26,7 +26,7 @@ typedef struct
 
 /*********************** FUNCTION DECLARATIONS **********************/
 void sha384_init(SHA384_CTX *ctx);
-void sha384_update(SHA384_CTX *ctx, const uint8 data[], size_t len);
+void sha384_update(SHA384_CTX *ctx, const uint8 data[], uint64 len);
 void sha384_final(SHA384_CTX *ctx, uint8 hash[]);
 
 

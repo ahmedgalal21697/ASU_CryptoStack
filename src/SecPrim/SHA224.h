@@ -10,26 +10,28 @@
 
 /*************************** HEADER FILES ***************************/
 #include <stddef.h>
-
+#include "Platform_Types.h"
 /****************************** MACROS ******************************/
-#define SHA224_BLOCK_SIZE 28 // SHA224 outputs a 28 byte digest
+#define SHA224_BLOCK_SIZE 28            // SHA224 outputs a 28 byte digest
 
 /**************************** DATA TYPES ****************************/
-typedef unsigned char BYTE; // 8-bit byte
-typedef unsigned int WORD;	// 32-bit word, change to "long" for 16-bit machines
+typedef unsigned char uint8;             // 8-bit byte
+typedef unsigned int  uint32;           // 32-bit word, change to "long" for 16-bit machines
 
-typedef struct
-{
-	BYTE data[64];
-	WORD datalen;
+typedef struct {
+	uint8 data[64];
+	uint32 datalen;
 	unsigned long long bitlen;
-	WORD state[8];
+	uint32 state[8];
 } SHA224_CTX;
 
 /*********************** FUNCTION DECLARATIONS **********************/
 void sha224_init(SHA224_CTX *ctx);
-void sha224_update(SHA224_CTX *ctx, const BYTE data[], size_t len);
-void sha224_final(SHA224_CTX *ctx, BYTE hash[]);
-void sha224(const BYTE data[], size_t len, BYTE hash[], SHA224_CTX *ctx);
+void sha224_update(SHA224_CTX *ctx, const uint8 data[], uint32 len);
+void sha224_final(SHA224_CTX *ctx, uint8 hash[]);
+
+
+
+
 
 #endif /* SHA224_H_ */

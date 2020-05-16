@@ -9,14 +9,11 @@
 #define SHA224_H_
 
 /*************************** HEADER FILES ***************************/
-#include <stddef.h>
-#include "Platform_Types.h"
+#include "Std_Types.h"
 /****************************** MACROS ******************************/
 #define SHA224_BLOCK_SIZE 28            // SHA224 outputs a 28 byte digest
 
 /**************************** DATA TYPES ****************************/
-typedef unsigned char uint8;             // 8-bit byte
-typedef unsigned int  uint32;           // 32-bit word, change to "long" for 16-bit machines
 
 typedef struct {
 	uint8 data[64];

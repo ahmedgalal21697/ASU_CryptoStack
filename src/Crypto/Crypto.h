@@ -18,6 +18,7 @@
 
 #include "Csm_Types.h"
 #include "Crypto_Cfg.h"
+#include "adaptor.h"
 
 
 #define CRYPTO_MODULE_ID 114

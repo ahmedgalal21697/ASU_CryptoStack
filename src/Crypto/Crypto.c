@@ -190,7 +190,8 @@ Std_ReturnType Crypto_ProcessJob(uint32 objectId, Crypto_JobType *job)
                     == (job->jobPrimitiveInfo->primitiveInfo->algorithm.family))
             {
 
-                if (*(job->jobPrimitiveInputOutput.outputLengthPtr) < 20)
+                if (*(job->jobPrimitiveInputOutput.outputLengthPtr)
+                        < SHA1_BLOCK_SIZE)
                 {
                     ret = CRYPTO_E_RE_SMALL_BUFFER;
                 }
@@ -198,7 +199,12 @@ Std_ReturnType Crypto_ProcessJob(uint32 objectId, Crypto_JobType *job)
                 else
                 {
                     /*call the algorithm*/
-                    *(job->jobPrimitiveInputOutput.outputLengthPtr) = 20;
+                    AlgoSHA1_adaptor(job->jobPrimitiveInputOutput.inputPtr,
+                                     job->jobPrimitiveInputOutput.inputLength,
+                                     &job->jobPrimitiveInputOutput.outputPtr);
+
+                    *(job->jobPrimitiveInputOutput.outputLengthPtr) =
+                            SHA1_BLOCK_SIZE;
                     ret = E_OK;
                 }
             }
@@ -206,7 +212,8 @@ Std_ReturnType Crypto_ProcessJob(uint32 objectId, Crypto_JobType *job)
             else if (CRYPTO_ALGOFAM_SHA2_224
                     == (job->jobPrimitiveInfo->primitiveInfo->algorithm.family))
             {
-                if (*(job->jobPrimitiveInputOutput.outputLengthPtr) < 28)
+                if (*(job->jobPrimitiveInputOutput.outputLengthPtr)
+                        < SHA224_BLOCK_SIZE)
                 {
                     ret = CRYPTO_E_RE_SMALL_BUFFER;
                 }
@@ -214,7 +221,12 @@ Std_ReturnType Crypto_ProcessJob(uint32 objectId, Crypto_JobType *job)
                 else
                 {
                     /*call the algorithm*/
-                    *(job->jobPrimitiveInputOutput.outputLengthPtr) = 28;
+                    AlgoSHA224_adaptor(job->jobPrimitiveInputOutput.inputPtr,
+                                       job->jobPrimitiveInputOutput.inputLength,
+                                       &job->jobPrimitiveInputOutput.outputPtr);
+
+                    *(job->jobPrimitiveInputOutput.outputLengthPtr) =
+                            SHA224_BLOCK_SIZE;
 
                     ret = E_OK;
                 }
@@ -223,7 +235,8 @@ Std_ReturnType Crypto_ProcessJob(uint32 objectId, Crypto_JobType *job)
             else if (CRYPTO_ALGOFAM_SHA2_256
                     == (job->jobPrimitiveInfo->primitiveInfo->algorithm.family))
             {
-                if (*(job->jobPrimitiveInputOutput.outputLengthPtr) < 32)
+                if (*(job->jobPrimitiveInputOutput.outputLengthPtr)
+                        < SHA256_BLOCK_SIZE)
                 {
                     ret = CRYPTO_E_RE_SMALL_BUFFER;
                 }
@@ -231,7 +244,11 @@ Std_ReturnType Crypto_ProcessJob(uint32 objectId, Crypto_JobType *job)
                 else
                 {
                     /*call the algorithm*/
-                    *(job->jobPrimitiveInputOutput.outputLengthPtr) = 32;
+                    AlgoSHA256_adaptor(job->jobPrimitiveInputOutput.inputPtr,
+                                       job->jobPrimitiveInputOutput.inputLength,
+                                       &job->jobPrimitiveInputOutput.outputPtr);
+                    *(job->jobPrimitiveInputOutput.outputLengthPtr) =
+                            SHA256_BLOCK_SIZE;
                 }
                 ret = E_OK;
             }
@@ -240,7 +257,8 @@ Std_ReturnType Crypto_ProcessJob(uint32 objectId, Crypto_JobType *job)
                     == (job->jobPrimitiveInfo->primitiveInfo->algorithm.family))
             {
 
-                if (*(job->jobPrimitiveInputOutput.outputLengthPtr) < 48)
+                if (*(job->jobPrimitiveInputOutput.outputLengthPtr)
+                        < SHA384_BLOCK_SIZE)
                 {
                     ret = CRYPTO_E_RE_SMALL_BUFFER;
                 }
@@ -248,7 +266,11 @@ Std_ReturnType Crypto_ProcessJob(uint32 objectId, Crypto_JobType *job)
                 else
                 {
                     /*call the algorithm*/
-                    *(job->jobPrimitiveInputOutput.outputLengthPtr) = 48;
+                    AlgoSHA384_adaptor(job->jobPrimitiveInputOutput.inputPtr,
+                                       job->jobPrimitiveInputOutput.inputLength,
+                                       &job->jobPrimitiveInputOutput.outputPtr);
+                    *(job->jobPrimitiveInputOutput.outputLengthPtr) =
+                            SHA384_BLOCK_SIZE;
 
                     ret = E_OK;
                 }
@@ -257,7 +279,8 @@ Std_ReturnType Crypto_ProcessJob(uint32 objectId, Crypto_JobType *job)
             else if (CRYPTO_ALGOFAM_SHA2_512
                     == (job->jobPrimitiveInfo->primitiveInfo->algorithm.family))
             {
-                if (*(job->jobPrimitiveInputOutput.outputLengthPtr) < 64)
+                if (*(job->jobPrimitiveInputOutput.outputLengthPtr)
+                        < SHA512_BLOCK_SIZE)
                 {
                     ret = CRYPTO_E_RE_SMALL_BUFFER;
                 }
@@ -265,7 +288,11 @@ Std_ReturnType Crypto_ProcessJob(uint32 objectId, Crypto_JobType *job)
                 else
                 {
                     /*call the algorithm*/
-                    *(job->jobPrimitiveInputOutput.outputLengthPtr) = 64;
+                    AlgoSHA512_adaptor(job->jobPrimitiveInputOutput.inputPtr,
+                                       job->jobPrimitiveInputOutput.inputLength,
+                                       &job->jobPrimitiveInputOutput.outputPtr);
+                    *(job->jobPrimitiveInputOutput.outputLengthPtr) =
+                            SHA512_BLOCK_SIZE;
 
                     ret = E_OK;
                 }
@@ -274,7 +301,8 @@ Std_ReturnType Crypto_ProcessJob(uint32 objectId, Crypto_JobType *job)
             else if (CRYPTO_ALGOFAM_CUSTOM
                     == (job->jobPrimitiveInfo->primitiveInfo->algorithm.family))
             {
-                if (*(job->jobPrimitiveInputOutput.outputLengthPtr) < 16)
+                if (*(job->jobPrimitiveInputOutput.outputLengthPtr)
+                        < MD5_BLOCK_SIZE)
                 {
                     ret = CRYPTO_E_RE_SMALL_BUFFER;
                 }
@@ -282,7 +310,11 @@ Std_ReturnType Crypto_ProcessJob(uint32 objectId, Crypto_JobType *job)
                 else
                 {
                     /*call the algorithm*/
-                    *(job->jobPrimitiveInputOutput.outputLengthPtr) = 16;
+                    AlgoMD5_adaptor(job->jobPrimitiveInputOutput.inputPtr,
+                                    job->jobPrimitiveInputOutput.inputLength,
+                                    &job->jobPrimitiveInputOutput.outputPtr);
+                    *(job->jobPrimitiveInputOutput.outputLengthPtr) =
+                            MD5_BLOCK_SIZE;
 
                     ret = E_OK;
                 }
